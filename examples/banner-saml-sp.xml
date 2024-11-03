@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Replace "entra-app-entity-id" with the Entra application's entity ID setup in "Basic SAML Configuration" section of the SAML confirguration. -->
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="entra-app-entity-id" entityID="entra-app-entity-id">
+<md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+<md:KeyDescriptor use="signing">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<!-- Insert the encoded section of the service provider public certificate that was exported from the Java keystore within the <ds:X509Certificate> tags. -->
+<ds:X509Certificate>
+<!-- INSERT THE SERVICE PROVIDER CERTIFICATE HERE. ERASE THIS COMMENT. -->
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</md:KeyDescriptor>
+<md:KeyDescriptor use="encryption">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<!-- Insert the encoded section of the service provider public certificate that was exported from the Java keystore within the <ds:X509Certificate> tags. -->
+<ds:X509Certificate>
+<!-- INSERT THE SERVICE PROVIDER CERTIFICATE HERE. ERASE THIS COMMENT. -->
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</md:KeyDescriptor>
+<!-- 1) Modify the URL to point the Banner app you are setting up.
+	 2) Replace "entra-app-entity-id" with the Entra application's entity ID setup in "Basic SAML Configuration" section of the SAML confirguration. -->
+<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://server.univ.edu:8443/SelfServiceApp/saml/SingleLogout/alias/entra-app-entity-id"/>
+<!-- 1) Modify the URL to point the Banner app you are setting up.
+	 2) Replace "entra-app-entity-id" with the Entra application's entity ID setup in "Basic SAML Configuration" section of the SAML confirguration. -->
+<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://server.univ.edu:8443/SelfServiceApp/saml/SingleLogout/alias/entra-app-entity-id"/>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameidformat:emailAddress</md:NameIDFormat>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameidformat:transient</md:NameIDFormat>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameidformat:persistent</md:NameIDFormat>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameidformat:unspecified</md:NameIDFormat>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameidformat:X509SubjectName</md:NameIDFormat>
+<!-- Modify the URL to point the Banner app you are setting up. -->
+<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://server.univ.edu:8443/SelfServiceApp/saml/SSO" index="0" isDefault="true"/>
+<!-- Modify the URL to point the Banner app you are setting up. -->
+<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:profiles:holderof-key:SSO:browser" Location="https://server.univ.edu:8443/SelfServiceApp/saml/SSO" hoksso:ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" index="2" xmlns:hoksso="urn:oasis:names:tc:SAML:2.0:profiles:holder-ofkey:SSO:browser"/>
+</md:SPSSODescriptor>
+</md:EntityDescriptor>

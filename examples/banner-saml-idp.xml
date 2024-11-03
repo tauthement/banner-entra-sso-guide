@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- Replace "entra-tenant-id" with your Microsoft Entra Tenant ID. The full URL can be found labeled as "Microsoft Entra Identifier" in the "Set up <Entra App Name>" section of the Entra SAML configuration. -->
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://sts.windows.net/entra-tenant-id/" cacheDuration="PT1440M">
+<md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+<md:KeyDescriptor use="signing">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<!-- Within the <ds:X509Certificate> tags, insert the identity provider public certificate that was downloaded (PEM Certificate Download) from the "SAML Certificates" section of the Entra SAML configuration. -->
+<ds:X509Certificate>
+<!-- INSERT THE IDP CERTIFICATE HERE. ERASE THIS COMMENT. -->
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</md:KeyDescriptor>
+<md:KeyDescriptor use="encryption">
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:X509Data>
+<!-- Within the <ds:X509Certificate> tags, insert the identity provider public certificate that was downloaded (PEM Certificate Download) from the "SAML Certificates" section of the Entra SAML configuration. -->
+<ds:X509Certificate>
+<!-- INSERT THE IDP CERTIFICATE HERE. ERASE THIS COMMENT. -->
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</md:KeyDescriptor>
+<!-- Replace the URL in the Location attribute with the URL labeled as "Logout URL" in the "Set up <Entra App Name>" section (box 4) of the Entra SAML Configuration. -->
+<md:SingleLogoutService Location="https://login.microsoftonline.com/entra-tenant-id/saml2" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"/>
+<!-- Replace the URL in the Location attribute with the URL labeled as "Logout URL" in the "Set up <Entra App Name>" section (box 4) of the Entra SAML Configuration.  -->
+<md:SingleLogoutService Location="https://login.microsoftonline.com/entra-tenant-id/saml2" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"/>
+<md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameidformat:unspecified</md:NameIDFormat>
+<!-- Replace the URL in the Location attribute with the URL labeled as "Login URL" in the "Set up <Entra App Name>" section (box 4) of the Entra SAML Configuration.  -->
+<md:SingleSignOnService Location="https://login.microsoftonline.com/entra-tenant-id/saml2" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"/>
+<!-- Replace the URL in the Location attribute with the URL labeled as "Login URL" in the "Set up <Entra App Name>" section (box 4) of the Entra SAML Configuration.  -->
+<md:SingleSignOnService Location="https://login.microsoftonline.com/entra-tenant-id/saml2" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"/>
+</md:IDPSSODescriptor>
+<md:ContactPerson contactType="administrative"/>
+</md:EntityDescriptor>
