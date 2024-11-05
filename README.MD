@@ -1,7 +1,7 @@
 # Integrating Microsoft Entra with Ellucian Banner Apps
 
-#### Author: Tim Authement, Nicholls State University
-#### Source: [https://github.com/tauthement/banner-entra-sso-guide](https://github.com/tauthement/banner-entra-sso-guide)
+**Author:** Tim Authement, Nicholls State University <br>
+**Source:** [https://github.com/tauthement/banner-entra-sso-guide](https://github.com/tauthement/banner-entra-sso-guide)
 
 ## Table of Contents
 
@@ -120,7 +120,7 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 
 ### Setting a Session Timeout Period
 
-You will need to create a Conditional Access policy to configure the session timeout period for Banner apps to avoid getting errors such as “Invalid username/password” or “Session Initialization Failed”. When you configure your Banner Admin and Banner Self-Services apps, you should set the variable called “maxAuthenticationAge” (in seconds) to match the timeout period you set here. For example, 1 hour = 3600 seconds. The “maxAuthenticationAge” variable should not be lower than the timeout period set in Entra or you will errors. The current default session period for Entra is 90 days. The lowest amount of time you can set is one hour.
+You will need to create a Conditional Access policy to configure the session timeout period for Banner apps to avoid getting errors such as “Invalid username/password” or “Session Initialization Failed”. When you configure your Banner Admin and Banner Self-Services apps, you should set the variable called “maxAuthenticationAge” (in seconds) to match the timeout period you set here. For example, 1 hour = 3600 seconds. The “maxAuthenticationAge” variable should not be lower than the timeout period set in Entra or you will get errors. The current default session period for Entra is 90 days. The lowest amount of time you can set is one hour.
 
 Please refer to Microsoft’s documentation on how to [configure adaptive session lifetime policies](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-session-lifetime). You should only need to set up Policy 1 (Sign-in Frequency Control). Policy 2 and 3 are optional. 
 
@@ -671,11 +671,11 @@ Please refer to the "Creating a PKCS #12 version of the Java Keystore" section t
 
 1. When creating the Entra application, add the following URL as the “Reply URL (Assertion Consumer Service URL)”. Modify as needed for your server.
 	* Ex. `https://appxtender.univ.edu/AppXtender/BdmSamlSso`
-2. Install the BDM SSO Files
+2. Install the BDM SSO Files.
 	* This is already well covered by Ellucian in their documentation. Please visit the [this link](https://resources.elluciancloud.com/bundle/banner_bdm_acn_install/page/t_install_bdm_sso_files.html) for more information.
-3. Follow the Ellucian documentation to edit the “Login.cshtml” and “Index.cshtml” file. 
-4. Copy the PFX keystore created in the “Creating a PKCS #12 version of the Java Keystore” section to the AppXtender install location.
-5. Locate the `bdm.sso.config` file within the AppXtender install location. Edit the following tags:
+	* Follow the Ellucian documentation to edit the “Login.cshtml” and “Index.cshtml” file. 
+3. Copy the PFX keystore to the AppXtender install location.
+4. Locate the `bdm.sso.config` file within the AppXtender install location. Edit the following tags:
 	* `SsoMode`
 		* Set to `SAML2`
 		* Ex. `<SsoMode>SAML2</SsoMode>`
@@ -708,10 +708,10 @@ Please refer to the "Creating a PKCS #12 version of the Java Keystore" section t
 	* `UDCIDAttributeName`
 		* Set to the name of the attribute being sent over from Entra. This is commonly set to “UDC_IDENTIFIER”.
 		* Ex. `<UDCIDAttributeName>UDC_IDENTIFIER</UDCIDAttributeName>`
-6. Save the `bdm.sso.config` file.
-7. Restart IIS
-8. Use the following URL format to access the site via SSO.
-	* Replace `Datasourcename` with the name of your data source. (ie. TEST, PROD, etc)
+5. Save the `bdm.sso.config` file.
+6. Restart IIS
+7. Use the following URL format to access the site via SSO.
+	* Replace `Datasourcename` with the name of your data source in AppXtender. (ie. TEST, PROD, etc)
 	* Ex. `https://server.univ.edu/AppXtender/DataSources/*Datasourcename*/?sso=true&DSN=*Datasourcename*`
 
 ### Configuring SSO Integration with Banner and AppXtender
