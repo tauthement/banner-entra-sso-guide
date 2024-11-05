@@ -356,17 +356,17 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 
 #### Deploying with ESM
 
-* Before signing in to ESM, place the service provider metadata and identity provider metadata files somewhere on your build server. Commonly, this is on JobSub. For example, I created a `saml_configuration` directory within the `BANNER9WAR` directory.
+1. Before signing in to ESM, place the service provider metadata and identity provider metadata files somewhere on your build server. Commonly, this is on JobSub. For example, I created a `saml_configuration` directory within the `BANNER9WAR` directory.
     * Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`  
     * Make sure the new directory and files are owned by the same user and group that the other directories are owned by.
         * `chown user:group -R saml_configuration`
     * Failure to do this can lead to failed builds.
-* The keystore file will need to be stored somewhere on your app server that is readable by Tomcat.  
+2. The keystore file will need to be stored somewhere on your app server that is readable by Tomcat.  
     * Ex. `/u01/app/tomcat/saml`
-* Login to ESM and select your environment
-* Go to “Env Settings”
-* Scroll to the “Banner Administrative Pages Configuration” or “Banner Access Management Configuration” section
-* Fill in the SAML configuration information
+3. Login to ESM and select your environment
+4. Go to “Env Settings”
+5. Scroll to the “Banner Administrative Pages Configuration” or “Banner Access Management Configuration” section
+6. Fill in the SAML configuration information
     * `Login Authentication Method`
         * Choose “SAML SSO”
     * `Identity Service Url`
@@ -389,19 +389,19 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
     * Application Navigator URL
         * This field is only located under the “Banner Administrative Pages Configuration” section.
         * Enter the URL to your Application Navigator install.
-* Click Save
-* Deploy Banner Admin Pages and Banner Access Management like you normally would using ESM. ESM will bundle the needed configuration and files into the WAR file.
+7. Click Save
+8. Deploy Banner Admin Pages and Banner Access Management like you normally would using ESM. ESM will bundle the needed configuration and files into the WAR file.
 
 #### Manual Configuration
 
 > **NOTE:** <br>
 > Since manual deployment may not be the same for every institution, I will only cover the broad view of what needs to be edited and configured. Adapt these instructions to your manual deployment methods.
 
-* The SAML configuration files for Banner Admin Pages and Banner Access Management can be found in the following locations:
+1. The SAML configuration files for Banner Admin Pages and Banner Access Management can be found in the following locations:
     * `/$CATALINA_HOME/webapps/BannerAdmin.ws/WEB-INF/classes`
     * `/$CATALINA_HOME/webapps/BannerAccessMgmt.ws/WEB-INF/classes`
-* Place the service provider XML file, identity provider XML file, and Java keystore within the “classes” directory. 
-* Edit the `config.properties` file
+2. Place the service provider XML file, identity provider XML file, and Java keystore within the “classes” directory. 
+3. Edit the `config.properties` file
     * `saml.keystore`
         * Enter the full path of the SAML keystore’s location on the app server. Prepend it with “file://”.
             * Ex. `file:///u01/app/tomcat/saml/samlkeystore.jks`
@@ -417,13 +417,13 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
         * Enter the file name of the service provider XML file within the “classes” directory. You only need to enter the file name, not the full path.
     * `saml.idp.metadata.filename`
         * Enter the file name of the identity provider XML file within the “classes” directory. You only need to enter the file name, not the full path.
-* Save the `config.properties` file.
-* Modify applicationContext.xml
+4. Save the `config.properties` file.
+5. Modify applicationContext.xml
     * This file is located in the “WEB-INF” directory. A preconfigured version for SAML can be found in “applicationContext_saml.xml”. 
 Since you will be using SAML, copy the contents of “applicationContext_saml.xml” to “applicationContext.xml”, or you can overwrite the file using the copy command.
         * `cp applicationContext_saml.xml applicationContext.xml`
-* Save the file
-* Redeploy the application using your preferred deployment method. If you’re just editing the files in the unpacked install location, reboot Tomcat and the new configuration will take effect. If you would like to modify the WAR file, see the "Configuring SSOManager" instructions in the "Banner 8 Self-Service" section for a relevant guide.
+6. Save the file
+7. Redeploy the application using your preferred deployment method. If you’re just editing the files in the unpacked install location, reboot Tomcat and the new configuration will take effect. If you would like to modify the WAR file, see the "Configuring SSOManager" instructions in the "Banner 8 Self-Service" section for a relevant guide.
 
 ## Banner 8 Self-Service
 
@@ -462,14 +462,14 @@ Store this file to be used in the "Configuring SSOManager" section.
 
 ### Configuring SSOManager
 
-* Copy the “ssomanager.war” file to another location on a local machine or the server. 
-* Unpack the WAR file using the following command:
+1. Copy the “ssomanager.war” file to another location on a local machine or the server. 
+2. Unpack the WAR file using the following command:
     * `java xvf ssomanager.war`
-* Copy the Java keystore to the ssomanager/WEB-INF/classes directory and rename it to samlKeystore.jks (with an uppercase K)
+3. Copy the Java keystore to the ssomanager/WEB-INF/classes directory and rename it to samlKeystore.jks (with an uppercase K)
     * `cp samlkeystore.jks ssomanager/WEB-INF/classes/samlKeystore.jks`
     * Overwrite the old file when prompted
     * **NOTE:** If you don’t want to rename the file, just edit the filename in the securityContext.xml file.
-* Edit the securityContext.xml file
+4. Edit the securityContext.xml file
     * Find the bean with id=”keyManager”
         * Edit the following info surrounded in brackets (remove the brackets):
             ```xml
@@ -484,41 +484,41 @@ Store this file to be used in the "Configuring SSOManager" section.
                     <constructor-arg type="java.lang.String" value="[certificate-alias]"/>
                 </bean>
             ```
-* Find the bean with class=”org.springframework.security.saml.metadata.ExtendedMetadata”
+5. Find the bean with class=”org.springframework.security.saml.metadata.ExtendedMetadata”
 Edit the property with name=”signingKey”. Set the value attribute to your certificate’s alias.
 	* `<property name="signingKey" value="banner-saml-sp"/>`
-* Find the bean with id=”webSSOprofileConsumer”
+6. Find the bean with id=”webSSOprofileConsumer”
 	* Replace with the following lines and set the maxAuthentication age (in seconds) to match your Entra session timeout period.
 		```xml
 		<bean id="webSSOprofileConsumer" class="org.springframework.security.saml.websso.WebSSOProfileConsumerImpl" lazy-init="true">
       		<property name="maxAuthenticationAge" value="3600" />
 		</bean>
 		```
-* Copy the identity provider XML file to the ssomanager/WEB-INF/classes directory.
+7. Copy the identity provider XML file to the ssomanager/WEB-INF/classes directory.
 	* The “Federation Metadata XML” file from the Entra SAML configuration site will work here.
-* Rename the identity provider XML file to idp-metadata.xml and overwrite the old file.
+8. Rename the identity provider XML file to idp-metadata.xml and overwrite the old file.
 	* `mv entra-idp-metadata.xml idp-metadata.xml`
-* Repack the WAR file
+9. Repack the WAR file
 	* Navigate to the directory where the WAR file is stored
 	* Use the following command to repack the WAR file:
 		* `jar uvf ssomanager.war WEB-INF`
-* Deploy the new version of ssomanager.war
-* Once SSOManager is done deploying, access the SSOManager configuration website.
+10. Deploy the new version of ssomanager.war
+11. Once SSOManager is done deploying, access the SSOManager configuration website.
 	* Go to the “SSB Configuration” tab
 	* Set the mode to “SAML 2.0”
 	* Set UDC ID Indicator to “Cookie”
 	* Set UDC ID Key to “UDC_IDENTIFIER”
-* Click Save
+12. Click Save
 
 ### Update GUACONF
 
-* Go to Banner Admin Pages
-* Open GUACONF
-* Select GLOBAL for the Application ID
-* On the Configurations tab, set banner8.SS.url to:
+1. Go to Banner Admin Pages
+2. Open GUACONF
+3. Select GLOBAL for the Application ID
+4. On the Configurations tab, set banner8.SS.url to:
 	* `https://server.univ.edu:8445/ssomanager/saml/login?relayState=/c/auth/SSB?pkg=`
 	* Modify the URL and port to point to your server.
-* On the Self-Service Parameters tab, set the following:
+5. On the Self-Service Parameters tab, set the following:
 	* `IDMLOGINURI`
 		* Set to the Login URL found in the Entra SAML configuration
 			* Ex. `https://login.microsoftonline.com/<tenant-id>/saml2`
@@ -528,7 +528,7 @@ Edit the property with name=”signingKey”. Set the value attribute to your ce
 			* Ex. https://server.univ.edu:8445/ssomanager/saml/logout
 			* This URL is case-sensitive.
 			* Modify the URL and port to point to your server.
-* Click Save 
+6. Click Save 
 
 ## AppXtender/AppEnhancer (Banner Document Managment)
 
@@ -538,13 +538,13 @@ To get AppXtender working with Entra, you must first install the SSO files. Inst
 
 ### Configuring AppXtender
 
-* When creating the Entra application, add the following URL as the “Reply URL (Assertion Consumer Service URL)”. Modify as needed for your server.
+1. When creating the Entra application, add the following URL as the “Reply URL (Assertion Consumer Service URL)”. Modify as needed for your server.
 	* Ex. `https://appxtender.univ.edu/AppXtender/BdmSamlSso`
-* Install the BDM SSO Files
+2. Install the BDM SSO Files
 	* This is already well covered by Ellucian in their documentation. Please visit the [this link](https://resources.elluciancloud.com/bundle/banner_bdm_acn_install/page/t_install_bdm_sso_files.html) for more information.
-* Follow the Ellucian documentation to edit the “Login.cshtml” and “Index.cshtml” file. 
-* Copy the PFX keystore created in the “Creating a PKCS #12 version of the Java Keystore” section to the AppXtender install location.
-* Locate the “bdm.sso.config” file within the AppXtender install location. Edit the following tags:
+3. Follow the Ellucian documentation to edit the “Login.cshtml” and “Index.cshtml” file. 
+4. Copy the PFX keystore created in the “Creating a PKCS #12 version of the Java Keystore” section to the AppXtender install location.
+5. Locate the “bdm.sso.config” file within the AppXtender install location. Edit the following tags:
 	* `SsoMode`
 		* Set to “SAML2”
 		* Ex. `<SsoMode>SAML2</SsoMode>`
@@ -576,13 +576,13 @@ To get AppXtender working with Entra, you must first install the SSO files. Inst
 	* UDCIDAttributeName
 		* Set to the name of the attribute being sent over from Entra. This is commonly set to “UDC_IDENTIFIER”.
 		* Ex. `<UDCIDAttributeName>UDC_IDENTIFIER</UDCIDAttributeName>`
-* Save the “bdm.sso.config” file.
-* Restart IIS
-* Use the following URL format to access the site via SSO:
+6. Save the “bdm.sso.config” file.
+7. Restart IIS
+8. Use the following URL format to access the site via SSO:
 	* Ex. `https://<appxtenderservername>/AppXtender/DataSources/ <Datasourcename>/?sso=true&DSN=<Datasourcename>`
 
 ### Configuring SSO Integration with Banner and AppXtender
-* Go to EXAINST in Banner Admin Pages
-* Set the ApplicationXtender Web Access Root value:
+1. Go to EXAINST in Banner Admin Pages
+2. Set the ApplicationXtender Web Access Root value:
 	* Modify the URL and port to point to your AppXtender instance 
 	* Ex. `https://appxtender.univ.edu/AppXtender/ISubmitQuery.aspx?sso=true`
