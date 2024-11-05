@@ -189,6 +189,10 @@ Ex. https://sts.windows.net/*entra-tenant-id*/
 
 An sample Student Self-Service groovy file is available in the `examples` directory, but do not use the sample file for all applications. It is only for demonstration purposes. The configuration files can change between releases and each app has different configurations. However, the SAML configuration should be fairly similar in all of the apps. You must modify the groovy file delivered with the version of the app being deployed.
 
+### Java Keystore File
+
+Please refer to the "Creating Keystores" section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group.  
+
 ### Metadata Files
 
 #### Service Provider XML Metadata File
@@ -339,6 +343,10 @@ Use the following settings for creating an app in Entra:
 
 ### Configuring Banner Admin Pages and Banner Access Management
 
+#### Java Keystore File
+
+Please refer to the "Creating Keystores" section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group.  
+
 #### Service Provider XML Metadata File
 
 For Banner Admin Pages and Banner Access Management, the service provider XML metadata file creation process will be the same as the process for Banner 9 Self-Service apps and Application Navigator. Follow the "Creating a Service Provider XML Metadata File" instructions in this guide.
@@ -449,6 +457,10 @@ Use the following settings for creating an app in Entra:
 * Include the following attribute:
     * `UDC_IDENTIFIER`
 
+### Java Keystore File
+
+Please refer to the "Creating Keystores" section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group.  
+
 ### Service Provider XML Metadata File
 
 Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the "Creating a Service Provider XML Metadata File" instructions in this guide. 
@@ -536,6 +548,10 @@ Edit the property with name=”signingKey”. Set the value attribute to your ce
 OpenText AppXtender is an app that integrates with Banner Document Management. Recently, the app was renamed to AppEnhancer. For this guide, I will refer to it as AppXtender. Version 20.4 of AppXtender was used to write this guide. Other versions may have different instructions. Please refer to the version’s documentation if these instructions do not work.
 
 To get AppXtender working with Entra, you must first install the SSO files. Instructions to download and install the files can be found in the Ellucian documentation linked in step 1.
+
+### PKCS #12 Keystore
+
+Please refer to the "Creating a PKCS #12 version of the Java Keystore" section to create a PKCS #12 version of the Java keystore. Store the file in the AppXtender install location.
 
 ### Configuring AppXtender
 
