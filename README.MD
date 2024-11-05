@@ -44,7 +44,7 @@
 	* [Configuring Entra for AppXtender](#configuring-entra-for-appxtender)
 	* [PKCS #12 Keystore File](#pkcs-12-keystore-file)
 	* [Configuring AppXtender](#configuring-appxtender)
-	* [Configuring SSO Integration with Banner and AppXtender](#configuring-sso-integration-with-banner-and-appxtender)
+	* [Configuring SSO Integration with Banner and AppXtender](#configuring-sso-integration-with-banner-admin-pages-and-appxtender)
 
 ## Introduction
 
@@ -714,7 +714,7 @@ Please refer to the "Creating a PKCS #12 version of the Java Keystore" section t
 	* Replace `Datasourcename` with the name of your data source in AppXtender. (ie. TEST, PROD, etc)
 	* Ex. `https://server.univ.edu/AppXtender/DataSources/*Datasourcename*/?sso=true&DSN=*Datasourcename*`
 
-### Configuring SSO Integration with Banner and AppXtender
+### Configuring SSO Integration with Banner Admin Pages and AppXtender
 1. Go to `EXAINST` in Banner Admin Pages
 2. Set the ApplicationXtender Web Access Root value:
 	* Modify the URL and port to point to your AppXtender instance 
