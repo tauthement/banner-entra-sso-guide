@@ -3,6 +3,47 @@
 #### Author: Tim Authement, Nicholls State University
 #### Source: [https://github.com/tauthement/banner-entra-sso-guide](https://github.com/tauthement/banner-entra-sso-guide)
 
+## Table of Contents
+
+* [Introduction](#introduction)
+* [Microsoft Entra](#microsoft-entra)
+	* [Creating an Entra Application](#creating-an-entra-application)
+	* [Setting a Session Timeout Period](#setting-a-session-timeout-period)
+* [Creating Keystores](#creating-keystores)
+	* [Creating a Java Keystore for Service Provider Applications](#creating-a-java-keystore-for-service-provider-applications)
+	* [Creating a PKCS #12 version of the Java Keystore](#creating-a-pkcs-12-version-of-the-java-keystore)
+	* [Exporting the Service Provider Public Certificate](#exporting-the-service-provider-public-certificate)
+* [Creating a Service Provider XML Metadata File](#creating-a-service-provider-xml-metadata-file)
+* [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file)
+	* [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator)
+	* [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service)
+* [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator)
+	* [Java Keystore File](#java-keystore-file)
+	* [Metadata Files](#metadata-files)
+		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file)
+		* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file)
+	* [Application Groovy File](#application-groovy-file)
+* [Banner Admin Pages and Banner Access Management](#banner-admin-pages-and-banner-access-management)
+	* [Configuring Entra (Banner Admin Pages)](#configuring-entra-banner-admin-pages)
+	* [Configuring Entra (Banner Access Management)](#configuring-entra-banner-access-management)
+	* [Configuring Banner Admin Pages and Banner Access Management](#configuring-banner-admin-pages-and-banner-access-management)
+		* [Java Keystore File](#java-keystore-file-1)
+		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file-1)
+		* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file-1)
+		* [Deploying with ESM](#deploying-with-esm)
+		* [Manual Configuration](#manual-configuration)
+* [Banner 8 Self-Service](#banner-8-self-service)
+	* [Configuring Entra](#configuring-entra)
+	* [Java Keystore File](#java-keystore-file-2)
+	* [Service Provider XML Metadata File](#service-provider-xml-metadata-file-2)
+	* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file-2)
+	* [Configuring SSOManager](#configuring-ssomanager)
+	* [Update GUACONF](#update-guaconf)
+* [AppXtender/AppEnhancer (Banner Document Management)](#appxtenderappenhancer-banner-document-managment)
+	* [PKCS #12 Keystore](#pkcs-12-keystore)
+	* [Configuring AppXtender](#configuring-appxtender)
+	* [Configuring SSO Integration with Banner and AppXtender](#configuring-sso-integration-with-banner-and-appxtender)
+
 ## Introduction
 
 The purpose of this documentation is to explain how to integrate Microsoft Entra as a single sign-on (SSO) provider with various Ellucian Banner apps. While Ellucian does have documentation pertaining to setting up SSO with different apps, those documents only cover Ethos Identity Management as the identity provider. I have done my best, through trial and error, to compile documentation to get several Banner applications working with Microsoft Entra and SAML. What works in my environment may not work in your environment. Modify your approach as needed. This documentation should only serve as a jump start on integrating Microsoft Entra with Banner apps.
@@ -94,7 +135,7 @@ Once the keystore is created, the X.509 public certificate will need to be expor
 
 It is also recommended to create a keystore for each environment (DEV, TEST, PROD) just to keep things separate, but not required. Do what is best for your work environment. This documentation will be based around the TEST environment.
 
-### Creating the Java Keystore for Service Provider Applications
+### Creating a Java Keystore for Service Provider Applications
 
 1. Open a command line/terminal
 2. Navigate to a directory to store the Java keystore
@@ -185,7 +226,7 @@ Ex. https://sts.windows.net/*entra-tenant-id*/
 4. Save the file and store it to a location on your server that is readable by your Tomcat server. This file location will be used in the SSB App Groovy File section.
 	* Ex. `/u01/app/tomcat/saml`
 
-## Configuring Banner 9 Self-Service Apps and Application Navigator
+## Banner 9 Self-Service Apps and Application Navigator
 
 An sample Student Self-Service groovy file is available in the `examples` directory, but do not use the sample file for all applications. It is only for demonstration purposes. The configuration files can change between releases and each app has different configurations. However, the SAML configuration should be fairly similar in all of the apps. You must modify the groovy file delivered with the version of the app being deployed.
 
@@ -435,8 +476,6 @@ Since you will be using SAML, copy the contents of “applicationContext_saml.xm
 7. Redeploy the application using your preferred deployment method. If you’re just editing the files in the unpacked install location, reboot Tomcat and the new configuration will take effect. If you would like to modify the WAR file, see the "Configuring SSOManager" instructions in the "Banner 8 Self-Service" section for a relevant guide.
 
 ## Banner 8 Self-Service
-
-### Introduction
 
 Banner 8 Self-Service uses the SSOManager app to facilitate single sign-on. SSOManager is part of the Banner Enterprise Identity Services (BEIS) package. Documentation for SSOManager can be found within the BEIS documentation.
 
