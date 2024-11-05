@@ -82,7 +82,8 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 	* **Box 1 - Basic SAML Configuration**
 		* Click Edit at the top right of the first box labeled “Basic SAML Configuration”. Enter a unique name in the “Identifier (Entity ID)” field. This name will be used in your service provider XML metadata file later on and should be unique to each Banner application. 
 			* Ex. `banner-stuss-test-sp`
-		* Enter the ACS (Assertion Consumer Service) URL of your Banner app in the “Reply URL” field. Below is just an example. Each Banner app section will include more specific examples. 
+		* Enter the ACS (Assertion Consumer Service) URL of your Banner app in the “Reply URL” field. 
+			* Below is just an example. Each Banner app section will include more specific examples. Please check the respective section instead of copying this one.
 			* Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
 			* The URL is case-sensitive.
 			* Modify the URL and port to point to your server.
@@ -95,7 +96,7 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 		* Delete all of the default claims under “Additional Claims”. None of these will be used in the app.
 		* Click “Add new claim” at the top of the page. 
 		* Enter “UDC_IDENTIFIER” in the Name field. It must be in all caps. 
-			*This is the default attribute shipped by Ellucian for all apps. The name can be changed in the respective SSB app’s groovy file under the “authenticationAssertionAttribute” setting. You will need this value synced to your Entra tenant. If you’re unsure if the value is synced, contact your Entra administrators. This value will be used to identify the user in the Banner DB. 
+			* This is the default attribute shipped by Ellucian for all apps. The name can be changed in the respective SSB app’s groovy file under the “authenticationAssertionAttribute” setting. You will need this value synced to your Entra tenant. If you’re unsure if the value is synced, contact your Entra administrators. This value will be used to identify the user in the Banner DB. 
 		* Leave “Namespace” empty.
 		* Select “Attribute” for “Source”
 		* For “Source Attribute”, select the attribute which your UDCID is being synced to.
