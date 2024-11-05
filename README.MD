@@ -18,13 +18,14 @@
 	* [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator)
 	* [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service)
 * [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator)
+	* [Configuring Entra for Banner 9 Self-Service Apps and Application Navigator](#configuring-entra-for-banner-9-self-service-apps-and-application-navigator)
 	* [Java Keystore File](#java-keystore-file)
 	* [Service Provider XML Metadata File](#service-provider-xml-metadata-file)
 	* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file)
 	* [Application Groovy File](#application-groovy-file)
 * [Banner Admin Pages and Banner Access Management](#banner-admin-pages-and-banner-access-management)
-	* [Configuring Entra (Banner Admin Pages)](#configuring-entra-banner-admin-pages)
-	* [Configuring Entra (Banner Access Management)](#configuring-entra-banner-access-management)
+	* [Configuring Entra for Banner Admin Pages](#configuring-entra-for-banner-admin-pages)
+	* [Configuring Entra for Banner Access Management](#configuring-entra-for-banner-access-management)
 	* [Configuring Banner Admin Pages and Banner Access Management](#configuring-banner-admin-pages-and-banner-access-management)
 		* [Java Keystore File](#java-keystore-file-1)
 		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file-1)
@@ -32,14 +33,15 @@
 		* [Deploying with ESM](#deploying-with-esm)
 		* [Manual Configuration](#manual-configuration)
 * [Banner 8 Self-Service](#banner-8-self-service)
-	* [Configuring Entra](#configuring-entra)
+	* [Configuring Entra for Banner 8 Self-Service](#configuring-entra-for-banner-8-self-service)
 	* [Java Keystore File](#java-keystore-file-2)
 	* [Service Provider XML Metadata File](#service-provider-xml-metadata-file-2)
 	* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file-2)
 	* [Configuring SSOManager](#configuring-ssomanager)
 	* [Update GUACONF](#update-guaconf)
 * [AppXtender/AppEnhancer (Banner Document Management)](#appxtenderappenhancer-banner-document-managment)
-	* [PKCS #12 Keystore](#pkcs-12-keystore)
+	* [Configuring Entra for AppXtender](#configuring-entra-for-appxtender)
+	* [PKCS #12 Keystore File](#pkcs-12-keystore-file)
 	* [Configuring AppXtender](#configuring-appxtender)
 	* [Configuring SSO Integration with Banner and AppXtender](#configuring-sso-integration-with-banner-and-appxtender)
 
@@ -241,6 +243,23 @@ In my testing, these apps support using the Federation Metadata XML file that ca
 
 An sample Student Self-Service groovy file is available in the `examples` directory, but do not use the sample file for all applications. It is only for demonstration purposes. The configuration files can change between releases and each app has different configurations. However, the SAML configuration should be fairly similar in all of the apps. You must modify the groovy file delivered with the version of the app being deployed.
 
+### Configuring Entra for Banner 9 Self-Service Apps and Application Navigator
+
+Use the following settings for creating an app in Entra:
+
+* Entity ID = `banner-stuss-test-sp`
+	* This can be whatever you want. Just make it unique to your Entra tenant. 
+	* I will be using Banner 9 Student Self-Service as an example.
+* Reply URL (ACS URL) = `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
+    * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
+    * Modify the URL and port to point to your server.
+* Logout URL = `https://server.univ.edu:8443/StudentSelfService/saml/SingleLogout/alias/banner-stuss-test-sp`
+    * Make sure to edit the entity ID at the end of the URL.
+	* This URL is case-sensitive.
+    * Modify the URL and port to point to your server.
+* Include the following attribute:
+    * `UDC_IDENTIFIER`
+
 ### Java Keystore File
 
 Please refer to the "Creating Keystores" section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group.
@@ -287,72 +306,72 @@ The following settings will be broken down by the sections within the .groovy fi
 
 * `grails.plugin.springsecurity.saml.active`
 	* Set this to `true` to enable SAML for the app.
-	* `grails.plugin.springsecurity.saml.active = true`
+	* Ex. `grails.plugin.springsecurity.saml.active = true`
 * `banner.sso.authentication.saml.localLogout`
 	* If you do not wish for the app to participate in Single Logout, set this to true.
 	* This value needs to be in quotes despite being a boolean.
-	* `banner.sso.authentication.saml.localLogout = 'false'`
+	* Ex. `banner.sso.authentication.saml.localLogout = 'false'`
 * `grails.plugin.springsecurity.saml.keyManager.storeFile`
 	* Set to the file location where the Java keystore is stored on the server. 	
 	* This will need to be prepended with `file:`.
-	* `grails.plugin.springsecurity.saml.keyManager.storeFile = 'file:/u01/app/tomcat/saml/samlkeystore.jks'`
+	* Ex. `grails.plugin.springsecurity.saml.keyManager.storeFile = 'file:/u01/app/tomcat/saml/samlkeystore.jks'`
 * `grails.plugin.springsecurity.saml.keyManager.storePass`
 	* Set to the password used for the keystore. This may not be the same password as the signing key password for the signing key within the keystore. 	
 	* Refer to the passwords you stored when you created the keystore.
-	* `grails.plugin.springsecurity.saml.keyManager.storePass = 'keystore-password'`
+	* Ex. `grails.plugin.springsecurity.saml.keyManager.storePass = 'keystore-password'`
 * `grails.plugin.springsecurity.saml.keyManager.passwords`
 	* Use an associative array with the alias of the certificate within the Java keystore as the key and the certificate’s signing key password.
-	* `grails.plugin.springsecurity.saml.keyManager.passwords = ['certificate-alias':'signing-key-password']`
+	* Ex. `grails.plugin.springsecurity.saml.keyManager.passwords = ['certificate-alias':'signing-key-password']`
 * `grails.plugin.springsecurity.saml.keyManager.defaultKey`
 	* Set to the `certificate-alias` from the previous step.
-	* `grails.plugin.springsecurity.saml.keyManager.defaultKey = 'certificate-alias'`
+	* Ex. `grails.plugin.springsecurity.saml.keyManager.defaultKey = 'certificate-alias'`
 * `grails.plugin.springsecurity.saml.maxAuthenticationAge`
 	* Set this value to the amount of time (in seconds) that is configured in the conditional access policy created in the “Setting a Session Timeout Period” section.
 	* This setting should not be lower than the session time configured in the conditional access policy or you will receive error messages when accessing the application.
 	* So you don’t have to bust out the calculator app: 3600 seconds = 1 hour
-	* `grails.plugin.springsecurity.saml.maxAuthenticationAge = 3600`
+	* Ex. `grails.plugin.springsecurity.saml.maxAuthenticationAge = 3600`
 * `grails.plugin.springsecurity.saml.metadata.sp.file`
 	* Set to the file location, on the server, of your service provider XML metadata file created earlier. 
 	* **NOTE:** You **do not** need to prepend it with `file:`.
-	* `grails.plugin.springsecurity.saml.metadata.sp.file = /u01/app/tomcat/saml/banner-stuss-test-sp.xml`
+	* Ex. `grails.plugin.springsecurity.saml.metadata.sp.file = /u01/app/tomcat/saml/banner-stuss-test-sp.xml`
 * `grails.plugin.springsecurity.saml.metadata.providers`
 	* Set to the file location, on the server, of your identity provider XML metadata file created earlier.
 	* This is an associative array. The key should be `eis` and the value set to the file location.
-	* `grails.plugin.springsecurity.saml.metadata.providers = [eis:'/u01/app/tomcat/saml/banner-entra-idp.xml']`
+	* Ex. `grails.plugin.springsecurity.saml.metadata.providers = [eis:'/u01/app/tomcat/saml/banner-entra-idp.xml']`
 * `grails.plugin.springsecurity.saml.metadata.defaultIdp`
 	* Set this to the entity ID of the IDP (Entra). 
 	* This URL can be found in the “Set up *Entra App Name*” box of the Entra SAML setup as the "Microsoft Entra Identifier". The URL will start with https://sts.windows.net and include your Entra tenant ID.
-	* `grails.plugin.springsecurity.saml.metadata.defaultIdp = https://sts.windows.net/*entra-tenant-id*/`
+	* Ex. `grails.plugin.springsecurity.saml.metadata.defaultIdp = https://sts.windows.net/*entra-tenant-id*/`
 * `grails.plugin.springsecurity.saml.metadata.sp.defaults`
 	* This is an associative array of settings for the service provider.
 	* `local`
 		* Set to `true`. No quotes are needed for booleans.
-		* `local: true`
+		* Ex. `local: true`
 	* `alias`
 		* Set to the entity ID of your SSB application. 
 		* This is the value of “Identifier (Entity ID)” in the “Basic SAML Configuration” section of the Entra SAML configuration. It is also referenced in the service provider XML metadata file.
-		* `alias: 'ssb-app-entityid-sp'`
+		* Ex. `alias: 'banner-stuss-test-sp'`
 	* `securityProfile`
 		* Set to `metaiop`.
-		* `securityProfile: 'metaiop'`
+		* Ex. `securityProfile: 'metaiop'`
 	* `signingKey`
 		* Set to the alias of the certificate within the Java keystore.
-		* `signingKey: 'certificate-alias'`
+		* Ex. `signingKey: 'certificate-alias'`
 	* `encryptionKey`
 		* Set to the alias of the certificate within the Java keystore.
-		* `encryptionKey: 'certificate-alias'`
+		* Ex. `encryptionKey: 'certificate-alias'`
 	* `tlsKey`
 		* Set to the alias of the certificate within the Java keystore.
-		* `tlsKey: 'certificate-alias'`
+		* Ex. `tlsKey: 'certificate-alias'`
 	* `requireArtifactResolveSigned`
 		* Set to `false`.
-		* `requireArtifactResolveSigned: false`
+		* Ex. `requireArtifactResolveSigned: false`
 	* `requireLogoutRequestSigned`
 		* Set to `false`.
-		* `requireLogoutRequestSigned: false`
+		* Ex. `requireLogoutRequestSigned: false`
 	* `requireLogoutResponseSigned`
 		* Set to `false`.
-		* `requireLogoutResponseSigned: false`
+		* Ex. `requireLogoutResponseSigned: false`
 * Save the file and redeploy using your preferred deployment method.
 
 ## Banner Admin Pages and Banner Access Management
@@ -365,7 +384,7 @@ Another note is that the “Federation Metadata XML” file does not seem to wor
 
 If you use the “bansecr” account with Banner Access Management, you will need to have this account synced or manually created in your Microsoft Entra tenant.
 
-### Configuring Entra (Banner Admin Pages)
+### Configuring Entra for Banner Admin Pages
 
 Use the following settings for creating an app in Entra:
 
@@ -380,7 +399,7 @@ Use the following settings for creating an app in Entra:
 * Include the following attribute:
     * `UDC_IDENTIFIER`
 
-### Configuring Entra (Banner Access Management)
+### Configuring Entra for Banner Access Management
 
 Use the following settings for creating an app in Entra:
 
@@ -475,7 +494,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
         * Enter the password for the Java keystore.
     * `saml.logout.success.url`
         * Keep the default location.
-		* `${webapp.location}/saml/logout`
+		* Ex. `${webapp.location}/saml/logout`
     * `saml.sign.key.alias`
         * Enter the alias of the signing certificate within the Java keystore.
     * `saml.sign.key.password`
@@ -505,7 +524,7 @@ Banner 8 Self-Service uses the SSOManager app to facilitate single sign-on. SSOM
 
 Configuring SSOManager requires that the WAR file is unpacked, edited, then repacked. Doing so requires that Java (and the jar executable) is installed on the machine that you use to modify the WAR file.
 
-### Configuring Entra
+### Configuring Entra for Banner 8 Self-Service
 
 Use the following settings for creating an app in Entra:
 
@@ -629,7 +648,7 @@ OpenText AppXtender is an app that integrates with Banner Document Management. R
 
 To get AppXtender working with Entra, you must first install the SSO files. Instructions to download and install the files can be found in the Ellucian documentation linked in the "Configuring AppXtender" section.
 
-### Configuring Entra
+### Configuring Entra for AppXtender
 
 * Entity ID = `banner-bdm-test-sp`
 	* This can be whatever you want. Just make it unique to your Entra tenant.
@@ -641,7 +660,7 @@ To get AppXtender working with Entra, you must first install the SSO files. Inst
 * Include the following attribute:
     * `UDC_IDENTIFIER`
 
-### PKCS #12 Keystore
+### PKCS #12 Keystore File
 
 Please refer to the "Creating a PKCS #12 version of the Java Keystore" section to create a PKCS #12 version of the Java keystore. Place the file in the AppXtender install directory. This directory will also have the `bdm.sso.config` file that needs to be edited.
 
