@@ -561,13 +561,13 @@ Store this file to be used in the "Configuring SSOManager" section.
 
 ### Configuring SSOManager
 
-1. Copy the “ssomanager.war” file to another location on a local machine or the server. 
+1. Copy the `ssomanager.war` file to another location on a local machine or the server. 
 2. Unpack the WAR file using the following command:
 
 	```
 	java xvf ssomanager.war
 	```
-3. Copy the Java keystore to the ssomanager/WEB-INF/classes directory and rename it to samlKeystore.jks (with an uppercase K)
+3. Copy the Java keystore to the `ssomanager/WEB-INF/classes` directory and rename it to samlKeystore.jks (with an uppercase K)
 
     ```
 	cp samlkeystore.jks ssomanager/WEB-INF/classes/samlKeystore.jks
