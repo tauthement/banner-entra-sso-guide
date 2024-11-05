@@ -1,6 +1,7 @@
 # Integrating Microsoft Entra with Ellucian Banner Apps
 
-### *by Tim Authement, Nicholls State University*
+#### Author: Tim Authement, Nicholls State University
+#### Source: [https://github.com/tauthement/banner-entra-sso-guide](https://github.com/tauthement/banner-entra-sso-guide)
 
 ## Introduction
 
