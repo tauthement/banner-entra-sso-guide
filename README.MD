@@ -603,21 +603,21 @@ Store this file to be used in the "Configuring SSOManager" section.
       		<property name="maxAuthenticationAge" value="3600" />
 		</bean>
 		```
-7. Copy the identity provider XML metadata file to the ssomanager/WEB-INF/classes directory.
+7. Copy the identity provider XML metadata file to the `ssomanager/WEB-INF/classes` directory.
 	* The “Federation Metadata XML” file from the Entra SAML configuration site will work here.
-8. Rename the identity provider XML metadata file to idp-metadata.xml and overwrite the old file.
+8. Rename the identity provider XML metadata file to `idp-metadata.xml` and overwrite the old file.
 
 	```
 	mv entra-idp-metadata.xml idp-metadata.xml
 	```
 9. Repack the WAR file
-	* Navigate to the directory where the WAR file is stored
+	* Navigate to the directory where the WAR file is stored.
 	* Use the following command to repack the WAR file:
 
 		```
 		jar uvf ssomanager.war WEB-INF
 		```
-10. Deploy the new version of ssomanager.war
+10. Deploy the new version of `ssomanager.war`
 11. Once SSOManager is done deploying, access the SSOManager configuration website.
 	* Go to the `SSB Configuration` tab
 	* Set the mode to `SAML 2.0`
