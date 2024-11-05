@@ -395,7 +395,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
         * Enter the alias of the certificate within the Java keystore.
     * `SAML Signing Key Password`
         * Enter the password for the signing certificate in the Java keystore. You will need to enter the password twice to confirm the password.
-    * Application Navigator URL
+    * `Application Navigator URL`
         * This field is only located under the “Banner Administrative Pages Configuration” section.
         * Enter the URL to your Application Navigator install.
 7. Click Save
@@ -427,7 +427,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
     * `saml.idp.metadata.filename`
         * Enter the file name of the identity provider XML file within the “classes” directory. You only need to enter the file name, not the full path.
 4. Save the `config.properties` file.
-5. Modify applicationContext.xml
+5. Modify `applicationContext.xml`
     * This file is located in the “WEB-INF” directory. A preconfigured version for SAML can be found in “applicationContext_saml.xml”. 
 Since you will be using SAML, copy the contents of “applicationContext_saml.xml” to “applicationContext.xml”, or you can overwrite the file using the copy command.
         * `cp applicationContext_saml.xml applicationContext.xml`
@@ -498,8 +498,10 @@ Store this file to be used in the "Configuring SSOManager" section.
                 </bean>
             ```
 5. Find the bean with class=”org.springframework.security.saml.metadata.ExtendedMetadata”
-Edit the property with name=”signingKey”. Set the value attribute to your certificate’s alias.
-	* `<property name="signingKey" value="banner-saml-sp"/>`
+	* Edit the property with name=”signingKey”. Set the value attribute to your certificate’s alias.
+		```xml
+		<property name="signingKey" value="banner-saml-sp"/>
+		```
 6. Find the bean with id=”webSSOprofileConsumer”
 	* Replace with the following lines and set the maxAuthentication age (in seconds) to match your Entra session timeout period.
 		```xml
@@ -517,10 +519,10 @@ Edit the property with name=”signingKey”. Set the value attribute to your ce
 		* `jar uvf ssomanager.war WEB-INF`
 10. Deploy the new version of ssomanager.war
 11. Once SSOManager is done deploying, access the SSOManager configuration website.
-	* Go to the “SSB Configuration” tab
-	* Set the mode to “SAML 2.0”
-	* Set UDC ID Indicator to “Cookie”
-	* Set UDC ID Key to “UDC_IDENTIFIER”
+	* Go to the `SSB Configuration` tab
+	* Set the mode to `SAML 2.0`
+	* Set UDC ID Indicator to `Cookie`
+	* Set UDC ID Key to `UDC_IDENTIFIER`
 12. Click Save
 
 ### Update GUACONF
@@ -528,7 +530,7 @@ Edit the property with name=”signingKey”. Set the value attribute to your ce
 1. Go to Banner Admin Pages
 2. Open GUACONF
 3. Select GLOBAL for the Application ID
-4. On the Configurations tab, set banner8.SS.url to:
+4. On the Configurations tab, set `banner8.SS.url` to:
 	* `https://server.univ.edu:8445/ssomanager/saml/login?relayState=/c/auth/SSB?pkg=`
 	* Modify the URL and port to point to your server.
 5. On the Self-Service Parameters tab, set the following:
@@ -538,7 +540,7 @@ Edit the property with name=”signingKey”. Set the value attribute to your ce
 			* Set the <tenant-id> to your Entra tenant ID.
 	* `IDMLOGOUTURI`
 		* Set to the SSOManager logout URL
-			* Ex. https://server.univ.edu:8445/ssomanager/saml/logout
+			* Ex. `https://server.univ.edu:8445/ssomanager/saml/logout`
 			* This URL is case-sensitive.
 			* Modify the URL and port to point to your server.
 6. Click Save 
@@ -563,7 +565,7 @@ Please refer to the "Creating a PKCS #12 version of the Java Keystore" section t
 4. Copy the PFX keystore created in the “Creating a PKCS #12 version of the Java Keystore” section to the AppXtender install location.
 5. Locate the “bdm.sso.config” file within the AppXtender install location. Edit the following tags:
 	* `SsoMode`
-		* Set to “SAML2”
+		* Set to `SAML2`
 		* Ex. `<SsoMode>SAML2</SsoMode>`
 	* `IdpSsoUrl`
 		* Set to the Login URL found in Box 4 of the Entra SAML configuration page. You can also use the URL in the example, but make sure to replace the tenant ID with your own.
@@ -574,32 +576,32 @@ Please refer to the "Creating a PKCS #12 version of the Java Keystore" section t
 	* `EncryptedAssertions`
 		* Set to false
 		* Ex.`<EncryptedAssertions>false</EncryptedAssertions>`
-	* IdpPublicKey
+	* `IdpPublicKey`
 		* Download the “Certificate (Raw)“ file from Box 3 in the Entra SAML configuration page. 
 		* Rename the file to “entra-idp.cer” or whatever you’d like. Place this file in the AppXtender install directory.
 		* Ex. `<IdpPublicKey>entra-idp.cer</IdpPublicKey>`
-	* IdpPublicKeyPassword
+	* `IdpPublicKeyPassword`
 		* Leave this empty as the downloaded certificate file from Entra has no password.
 		* Ex. `<IdpPublicKeyPassword></IdpPublicKeyPassword>`
-	* SpPrivateKey
+	* `SpPrivateKey`
 		* Enter the PFX file that was copied earlier to the AppXtender install directory.
 		* Ex. `<SpPrivateKey>entra-idp.cer</SpPrivateKey>`
-	* SpPrivateKeyPassword
+	* `SpPrivateKeyPassword`
 		* Enter the password of the PFX file.
 		* Ex. `<SpPrivateKeyPassword>keystorepassword</SpPrivateKeyPassword>`
-	* ArtifactServiceUrl
+	* `ArtifactServiceUrl`
 		* Enter the URL for AppXtender
 		* Ex. `<ArtifactServiceUrl>https://appxtender.univ.edu/AppXtender</ArtifactServiceUrl>`
-	* UDCIDAttributeName
+	* `UDCIDAttributeName`
 		* Set to the name of the attribute being sent over from Entra. This is commonly set to “UDC_IDENTIFIER”.
 		* Ex. `<UDCIDAttributeName>UDC_IDENTIFIER</UDCIDAttributeName>`
-6. Save the “bdm.sso.config” file.
+6. Save the `bdm.sso.config` file.
 7. Restart IIS
 8. Use the following URL format to access the site via SSO:
-	* Ex. `https://<appxtenderservername>/AppXtender/DataSources/ <Datasourcename>/?sso=true&DSN=<Datasourcename>`
+	* Ex. `https://<appxtenderservername>/AppXtender/DataSources/<Datasourcename>/?sso=true&DSN=<Datasourcename>`
 
 ### Configuring SSO Integration with Banner and AppXtender
-1. Go to EXAINST in Banner Admin Pages
+1. Go to `EXAINST` in Banner Admin Pages
 2. Set the ApplicationXtender Web Access Root value:
 	* Modify the URL and port to point to your AppXtender instance 
 	* Ex. `https://appxtender.univ.edu/AppXtender/ISubmitQuery.aspx?sso=true`
