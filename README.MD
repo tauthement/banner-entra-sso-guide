@@ -593,7 +593,7 @@ Store this file to be used in the "Configuring SSOManager" section.
 	* Edit the property with `name=”signingKey”`. Set the value attribute to the certificate alias.
 
 		```xml
-		<property name="signingKey" value="banner-saml-sp"/>
+		<property name="signingKey" value="[certificate-alias]"/>
 		```
 6. Find the bean with `id=”webSSOprofileConsumer”`
 	* Replace with the following lines and set the `maxAuthenticationAge` value (in seconds) to match your Entra session timeout period.
