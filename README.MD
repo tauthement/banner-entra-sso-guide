@@ -104,7 +104,7 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 		* Click on the Download link next to “Federation Metadata XML”.
 			* Save and rename this file to be relevant to the app you will be deploying. This will be the identity provider XML metadata file for some of the apps. Each app will have its own identity provider XML metadata file. 
 		* Click Edit at the top right of the “SAML Certificates” box.
-			* Here you will find what will be referred to as your IDP certificate. Each Entra app will have its own IDP certificate. If you downloaded the identity provider XML metadata file, you don’t need to download the certificate since it’s already included in the XML file. However, if you want to manually create your own identity provider XML metadata files, you will need to download the IDP certificate. 
+			* Here you will find what will be referred to as your identity provider certificate. Each Entra app will have its own identity provider certificate. If you downloaded the identity provider XML metadata file, you don’t need to download the certificate since it’s already included in the XML file. However, if you want to manually create your own identity provider XML metadata files, you will need to download the identity provider certificate. 
 				* In the list of certificates, click on the three dots of the Active certificate.
 				* Click on “PEM certificate download” to download the X.509 version of the certificate. This will be used in the setup of the applications.
 					* To keep track of things, I recommend renaming the file similar to your entity ID.
@@ -127,7 +127,7 @@ You will need to add new Entra applications to the conditional access policy eac
 
 ## Creating Keystores
 
-A Java keystore is needed to generate a self-signed certificate for the service provider (SP) applications (Admin Pages, Self-Service apps, Banner 8 Self-Serivce, etc.). The commands used in this documentation are for the Linux/macOS version of keytool. However, the Windows version of keytool should be very similar. Since the arguments available in keytool can vary depending on the version installed, it is recommended to look up the documentation for that version.
+A Java keystore is needed to generate a self-signed certificate for the service provider applications (Admin Pages, Self-Service apps, Banner 8 Self-Serivce, etc.). The commands used in this documentation are for the Linux/macOS version of keytool. However, the Windows version of keytool should be very similar. Since the arguments available in keytool can vary depending on the version installed, it is recommended to look up the documentation for that version.
 
 The Java keystore should be stored somewhere on your server that is readable by the Linux user running your Tomcat server. The command below will generate a self-signed certificate that is valid for 9999 days. Please modify the validity period to your liking. To ensure compatibility with Entra, the keystore must use SHA256 with RSA as the signing algorithm. For compatibility with Banner apps, the keystore type must be in JKS format. In my testing, the Banner apps do not support PKCS12 keystores for the SAML configuration.
 
@@ -209,14 +209,14 @@ This is a two-step process. You will first need to export the public certificate
 
 ## Creating an Identity Provider XML Metadata File
 
-Some apps discussed in this guide allow you to use an IDP metadata file downloaded from Entra. For those apps that cannot use the downloaded file, you must manually create an IDP metadata file.
+Some apps discussed in this guide allow you to use "Federation Metadata XML” file downloaded from Entra. For those apps that cannot use the downloaded file, you must manually create an identity provider metadata file.
 
 ### Banner 9 Self-Service Apps and Application Navigator
 
-In my testing, these apps support using the Federation Metadata XML file that can be downloaded from the MS Entra SAML configuration page. 
+In my testing, these apps support using the "Federation Metadata XML" file that can be downloaded from the MS Entra SAML configuration page. 
 
 1. Go to the Entra SAML configuration page
-2. In the “SAML Certificates” section, click Download next to “Federated Metadata XML”.
+2. In the “SAML Certificates” section, click Download next to "Federation Metadata XML”.
 3. Rename the downloaded file to a name of your choosing. Preferably one without spaces so you don’t have to escape any of the spaces later.
 	* Ex. `banner-stuss-test-idp.xml`
 4. Store the file to a location on your server that is readable by your Tomcat server. This file location will be used in the SSB App Groovy File section.
@@ -268,13 +268,13 @@ Please refer to the "Creating Keystores" section to learn how to create a keysto
 
 Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the "Creating a Service Provider XML Metadata File" instructions in this guide. 
 
-The file will need to be stored on the same server as your application and be readable by Tomcat. For example, I stored the file at `/u01/app/tomcat/saml` and made the `tomcat` user and group the owner of the directory and the files within it. I store the IDP XML metadata and Java keystore files in there as well.
+The file will need to be stored on the same server as your application and be readable by Tomcat. For example, I stored the file at `/u01/app/tomcat/saml` and made the `tomcat` user and group the owner of the directory and the files within it. I store the identity provider XML metadata and Java keystore files in there as well.
 
 ### Identity Provider XML Metadata File
 
-For the Banner 9 Self-Service apps and Application Navigator, I had luck with using the Federation Metadata XML file downloaded from Entra. Please see the "Banner 9 Self-Service Apps and Application Navigator" section of "Creating an Identity Provider XML Metadata File" for more instructions. If those files don't work for you, please try manually creating the identity provider XML metadata file using the samle file in the `examples` directory of this project.
+For the Banner 9 Self-Service apps and Application Navigator, I had luck with using the "Federation Metadata XML" file downloaded from Entra. Please see the "Banner 9 Self-Service Apps and Application Navigator" section of "Creating an Identity Provider XML Metadata File" for more instructions. If those files don't work for you, please try manually creating the identity provider XML metadata file using the sample file in the `examples` directory of this project.
 
-This file should be stored in the same location as the SP XML metadata file and Java keystore.
+This file should be stored in the same location as the service provider XML metadata file and Java keystore.
 
 ### Application Groovy File
 	
@@ -339,7 +339,7 @@ The following settings will be broken down by the sections within the .groovy fi
 	* This is an associative array. The key should be `eis` and the value set to the file location.
 	* Ex. `grails.plugin.springsecurity.saml.metadata.providers = [eis:'/u01/app/tomcat/saml/banner-entra-idp.xml']`
 * `grails.plugin.springsecurity.saml.metadata.defaultIdp`
-	* Set this to the entity ID of the IDP (Entra). 
+	* Set this to the entity ID of the identity provider (Entra). 
 	* This URL can be found in the “Set up *Entra App Name*” box of the Entra SAML setup as the "Microsoft Entra Identifier". The URL will start with https://sts.windows.net and include your Entra tenant ID.
 	* Ex. `grails.plugin.springsecurity.saml.metadata.defaultIdp = https://sts.windows.net/*entra-tenant-id*/`
 * `grails.plugin.springsecurity.saml.metadata.sp.defaults`
@@ -430,7 +430,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 
 #### Identity Provider XML Metadata File
 
-Banner Admin Pages and Banner Access Management cannot use the Federation Metadata XML file downloaded from Entra, in my testing. Instead, you must use the sample XML metadata file from the `examples` directory of this project. Please see the "Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service" section of "Creating an Identity Provider XML Metadata File" for more instructions.
+Banner Admin Pages and Banner Access Management cannot use the "Federation Metadata XML" file downloaded from Entra, in my testing. Instead, you must use the sample XML metadata file from the `examples` directory of this project. Please see the "Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service" section of "Creating an Identity Provider XML Metadata File" for more instructions.
 
 This file should be stored in the same location as the service provider XML metadata file if you are using ESM. Make sure it is readable by ESM. 
 
@@ -552,7 +552,7 @@ Store this file locally to be used in the "Configuring SSOManager" section.
 
 ### Identity Provider XML Metadata File
 
-The Federation Metadata XML metadata file downloaded from Entra did not work with SSOManager when I tested it. Instead, I used the sample identity provider XML metadata file found in the `examples` directory of this project. Please see the "Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service" section of "Creating an Identity Provider XML Metadata File" for more instructions.
+The "Federation Metadata XML" metadata file downloaded from Entra did not work with SSOManager when I tested it. Instead, I used the sample identity provider XML metadata file found in the `examples` directory of this project. Please see the "Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service" section of "Creating an Identity Provider XML Metadata File" for more instructions.
 
 Store this file to be used in the "Configuring SSOManager" section.
 
