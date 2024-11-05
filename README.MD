@@ -2,7 +2,6 @@
 
 ### *by Tim Authement, Nicholls State University*
 
-
 ## Introduction
 
 The purpose of this documentation is to explain how to integrate Microsoft Entra as a single sign-on (SSO) provider with various Ellucian Banner apps. While Ellucian does have documentation pertaining to setting up SSO with different apps, those documents only cover Ethos Identity Management as the identity provider. I have done my best, through trial and error, to compile documentation to get several Banner applications working with Microsoft Entra and SAML. What works in my environment may not work in your environment. Modify your approach as needed. This documentation should only serve as a jump start on integrating Microsoft Entra with Banner apps.
@@ -38,14 +37,14 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 11. On the “Set up Single Sign-On with SAML” page, you will see five boxes labeled with numbers. The steps below will detail each one.
 	* **Box 1 - Basic SAML Configuration**
 		* Click Edit at the top right of the first box labeled “Basic SAML Configuration”.
-Enter a unique name in the “Identifier (Entity ID)” field. This name will be used in your service provider XML file later on and should be unique to each Banner application. 
-			* Example: `banner-stuss-test-sp`
+Enter a unique name in the “Identifier (Entity ID)” field. This name will be used in your service provider XML metadata file later on and should be unique to each Banner application. 
+			* Ex. `banner-stuss-test-sp`
 		* Enter the ACS (Assertion Consumer Service) URL of your Banner app in the “Reply URL” field. Below is just an example. Each Banner app section will include more specific examples. 
-			* Example: `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
+			* Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
 			* The URL is case-sensitive.
 			* Modify the URL and port to point to your server.
 		* Enter a URL in the “Logout URL” field. This URL will be used to send data to the app in the event of a Single Logout (SLO) being triggered. If you don’t use SLO, you may ignore this field. The URL will follow the example below. Replace <entity-id> with the Entity ID entered in the “Identifier” field. Below is just an example. Each Banner app section will include more specific examples.
-			* Example: `https://server.univ.edu:8443/StudentSelfService/saml/SingleLogout/alias/<entity-id>`
+			* Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SingleLogout/alias/<entity-id>`
 		* Click Save
 	* **Box 2 - Attributes & Claims**
 		* Click Edit at the top right of the “Attributes & Claims” box.
@@ -61,16 +60,16 @@ Enter a unique name in the “Identifier (Entity ID)” field. This name will be
 		* Click Save
 	* **Box 3 - SAML Certificates**
 		* Click on the Download link next to “Federation Metadata XML”.
-			* Save and rename this file to be relevant to the app you will be deploying. This will be the identity provider metadata XML file for some of the apps. Each app will have its own IDP metadata XML file. 
+			* Save and rename this file to be relevant to the app you will be deploying. This will be the identity provider XML metadata file for some of the apps. Each app will have its own identity provider XML metadata file. 
 		* Click Edit at the top right of the “SAML Certificates” box.
-Here you will find what will be referred to as your IDP certificate. Each Entra app will have its own IDP certificate. If you downloaded the IDP metadata XML file, you don’t need to download the certificate since it’s already included in the XML file. However, if you want to manually create your own IDP XML files, you will need to download the IDP certificate. 
+Here you will find what will be referred to as your IDP certificate. Each Entra app will have its own IDP certificate. If you downloaded the identity provider XML metadata file, you don’t need to download the certificate since it’s already included in the XML file. However, if you want to manually create your own identity provider XML metadata files, you will need to download the IDP certificate. 
 			* In the list of certificates, click on the three dots of the Active certificate.
 			* Click on “PEM certificate download” to download the X.509 version of the certificate. This will be used in the setup of the applications.
 				* To keep track of things, I recommend renaming the file similar to your entity ID.
-					* Example: `banner-stuss-test-idp.pem`
+					* Ex. `banner-stuss-test-idp.pem`
 		* For “Signing Option”, select “Sign SAML Assertion”.
 		* For “Signing Algorithm”, select “SHA-256”. 
-		* Under “Notification Email Addresses,” add any email addresses that should be alerted when the certificate is about to expire. You will need to update the certificate in the IDP XML file when it expires.
+		* Under “Notification Email Addresses,” add any email addresses that should be alerted when the certificate is about to expire. You will need to update the certificate in the identity provider XML metadata file when it expires.
 	* **Box 4 - Set up "Entra App Name"**
 		* There’s nothing to configure here. The URLs listed here will be used later on in the app configuration files. You may want to document them, or come back to them later.
 	* **Box 5 - Test Single Sign-on with "Entra App Name"**
@@ -90,7 +89,7 @@ A Java keystore is needed to generate a self-signed certificate for the service 
 
 The Java keystore should be stored somewhere on your server that is readable by the Linux user running your Tomcat server. The command below will generate a self-signed certificate that is valid for 9999 days. Please modify the validity period to your liking. To ensure compatibility with Entra, the keystore must use SHA256 with RSA as the signing algorithm. For compatibility with Banner apps, the keystore type must be in JKS format. In my testing, the Banner apps do not support PKCS12 keystores for the SAML configuration.
 
-Once the keystore is created, the X.509 public certificate will need to be exported. Keep the file stored away to be used within the service provider XML file later. The same keystore file (and exported public certificate) can be used for all of the applications. You do not need to create a keystore for each application. 
+Once the keystore is created, the X.509 public certificate will need to be exported. Keep the file stored away to be used within the service provider XML metadata file later. The same keystore file (and exported public certificate) can be used for all of the applications. You do not need to create a keystore for each application. 
 
 It is also recommended to create a keystore for each environment (DEV, TEST, PROD) just to keep things separate, but not required. Do what is best for your work environment. This documentation will be based around the TEST environment.
 
@@ -112,7 +111,7 @@ This version of the self-signed certificate will be used for Banner AppXtender. 
 
 1. Convert the JKS file to a PFX file using the following command:
 	* <pre>keytool -importkeystore -srckeystore samlkeystore.jks 
-	 -srcstoretype JKS -deststoretype PKCS12 -destkeystore samlkeystore.p12</pre>
+	 		-srcstoretype JKS -deststoretype PKCS12 -destkeystore samlkeystore.pfx</pre>
 2. You will need to enter the destination and source keystore passwords. This keystore and password will only be used in the AppXtender configuration file.
 
 ### Exporting the Service Provider Public Certificate
@@ -125,11 +124,11 @@ This is a two-step process. You will first need to export the public certificate
 3. Convert the PEM file to X.509 format using the following command:
 	* `keytool -printcert -rfc -file banner-saml-sp.pem > banner-saml-sp.crt`
 4. A file named “banner-saml-sp.crt” will be created.
-5. This will be used as your service provider (SP) certificate later on.
+5. This will be used as your service provider certificate in your service provider XML metadata file.
 
-## Creating a Service Provider XML File
+## Creating a Service Provider XML Metadata File
 
-1. Download the example service provider XML file.
+1. Download the example service provider XML metadata file.
 2. To edit this file, you will need the entity ID from “Box 1 - Basic SAML Configuration” of the Entra application setup. You will also need the service provider public certificate that was exported in the “Exporting the Service Provider Public Certificate” section.
 3. Edit the following elements in the XML file.
 	* `<md:SingleSignOnService>`
@@ -139,21 +138,21 @@ This is a two-step process. You will first need to export the public certificate
 		* You only need to copy the encoded section between `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----`. 
 	* `<md:SingleLogoutService>`
 		* In both `<md:SingleLogoutService>` elements, edit the `Location` attributes to the same URL. Use the following example and modify it for the application you are configuring. Replace <entity-id> with the Entity ID used in step 1b.
-		* Example: `https://server.univ.edu:8443/StudentSelfService/saml/SingleLogout/alias/<entity-id>`
+		* Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SingleLogout/alias/<entity-id>`
 		* The URL is case-sensitive.
 		* Modify the URL and port to point to your server.
 	* `<md:AssertionConsumerService>`
 		* In both `<md:AssertionConsumerService>` elements, edit the `Location` attributes to the same URL. Use the following example and modify it for the application you are configuring.
-		* Example: `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
+		* Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
 		* The URL is case-sensitive.
 		* Modify the URL and port to point to your server.
 4. Save the file 
 5. Banner 9 Self-Service and Application Navigator only:
 	* Store the XML file in a directory on your server that is readable by your Tomcat server. 
-	* Example: `/u01/app/tomcat/saml`
+	* Ex. `/u01/app/tomcat/saml`
 	* Other apps like Banner Admin Pages, Banner Access Management, and SSOManager (Banner 8 Self-Service), will require the metadata files to be added to the WAR files.
 
-## Creating an Identity Provider XML File
+## Creating an Identity Provider XML Metadata File
 
 Some apps discussed in this guide allow you to use an IDP metadata file downloaded from Entra. For those apps that cannot use the downloaded file, you must manually create an IDP metadata file.
 
@@ -164,9 +163,9 @@ In my testing, these apps support using the Federation Metadata XML file that ca
 1. Go to the Entra SAML configuration page
 2. In the “SAML Certificates” section, click Download next to “Federated Metadata XML”.
 3. Rename the downloaded file to a name of your choosing. Preferably one without spaces so you don’t have to escape any of the spaces later.
-	* Example: `banner-stuss-test-idp.xml`
+	* Ex. `banner-stuss-test-idp.xml`
 4. Store the file to a location on your server that is readable by your Tomcat server. This file location will be used in the SSB App Groovy File section.
-	* Example: `/u01/app/tomcat/saml`
+	* Ex. `/u01/app/tomcat/saml`
 
 ### Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service
 
@@ -183,97 +182,407 @@ Ex. https://sts.windows.net/*entra-tenant-id*/
 	* `<md:SingleSignOnService>`
 		* In both `<md:SingleSignOnService>` elements, edit the `Location` attributes to the same URL. Copy the URL from the “Login URL” field found in the Entra SAML configuration under “Box 4 - Set up *Entra App Name*”.
 4. Save the file and store it to a location on your server that is readable by your Tomcat server. This file location will be used in the SSB App Groovy File section.
-	* Example: `/u01/app/tomcat/saml`
+	* Ex. `/u01/app/tomcat/saml`
 
 ## Configuring Banner 9 Self-Service Apps and Application Navigator
 
 An sample Student Self-Service groovy file is available in the `examples` directory, but do not use the sample file for all applications. It is only for demonstration purposes. The configuration files can change between releases and each app has different configurations. However, the SAML configuration should be fairly similar in all of the apps. You must modify the groovy file delivered with the version of the app being deployed.
 
-**NOTE:** If you were previously using CAS for SSO, make sure you set “active” to false in the “CAS Configuration” section.
+### Metadata Files
+
+#### Service Provider XML Metadata File
+
+Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the "Creating a Service Provider XML Metadata File" instructions in this guide. 
+
+The file will need to be stored on the same server as your application and be readable by Tomcat. For example, I stored the file at `/u01/app/tomcat/saml` and made the `tomcat` user and group the owner of the directory and the files within it. I store the IDP XML metadata and Java keystore files in there as well.
+
+#### Identity Provider XML Metadata File
+
+For the Banner 9 Self-Service apps and Application Navigator, I had luck with using the Federation Metadata XML file downloaded from Entra. Please see the "Banner 9 Self-Service Apps and Application Navigator" section of "Creating an Identity Provider XML Metadata File" for more instructions. If those files don't work for you, please try manually creating the identity provider XML metadata file using the samle file in the `examples` directory of this project.
+
+This file should be stored in the same location as the SP XML metadata file and Java keystore.
+
+### Application Groovy File
 	
-* Example: `active = false`
-	
+Each of these apps are configured using a .groovy file. If you've ever deployed a SSB 9 app, you should be familiar with these.
+
 The following settings will be broken down by the sections within the .groovy file.
 
-### Authentication Provider Configuration 
+#### Authentication Provider Configuration 
 
 * `ssoEnabled`
 	* Set to true to enable single sign-on for the application.
-	* Example: `boolean ssoEnabled = true`
+	* `boolean ssoEnabled = true`
 * `authenticationProvider`
 	* Set it to “saml” to use SAML as the SSO protocol.
 	* **NOTE:** Use single quotes.
-	* Example: `authenticationProvider = ‘saml’`
+	* `authenticationProvider = ‘saml’`
 * authenticationAssertionAttribute
 	* Set to “UDC_IDENTIFIER”
+	* `authenticationAssertionAttribute = 'UDC_IDENTIFIER'`
 
-### SAML Configuration
+#### CAS Configuration
+
+* `active`
+	* Set to `false`
+	* Since SAML will be used, make sure CAS is disabled. Double check this setting if you were previously using CAS.
+	* `active = false`	
+
+#### SAML Configuration
 
 * `grails.plugin.springsecurity.saml.active`
 	* Set this to true to enable SAML for the app.
-	* Example: `grails.plugin.springsecurity.saml.active = true`
+	* `grails.plugin.springsecurity.saml.active = true`
 * `banner.sso.authentication.saml.localLogout`
 	* If you do not wish for the app to participate in Single Logout, set this to true.
 	* This value does need to be in quotes despite being a boolean.
-	* Example: `banner.sso.authentication.saml.localLogout = 'false'`
+	* `banner.sso.authentication.saml.localLogout = 'false'`
 * `grails.plugin.springsecurity.saml.keyManager.storeFile`
 	* Set to the file location where the Java keystore is stored on the server. 	* This will need to be prepended with “file:”.
-	* Example: `‘file:/u01/app/tomcat/saml/samlkeystore.jks’`
+	* `grails.plugin.springsecurity.saml.keyManager.storeFile = 'file:/u01/app/tomcat/saml/samlkeystore.jks'`
 * `grails.plugin.springsecurity.saml.keyManager.storePass`
 	* Set to the password used for the keystore. This may not be the same password as the signing key password for the signing key within the keystore. 	* Refer to the passwords you stored when you created the keystore.
+	* `grails.plugin.springsecurity.saml.keyManager.storePass = 'keystore-password'`
 * `grails.plugin.springsecurity.saml.keyManager.passwords`
 	* Use an associative array with the alias of the certificate within the Java keystore as the key and the certificate’s signing key password.
-	* Example: `grails.plugin.springsecurity.saml.keyManager.passwords = [ 'certificate-alias': 'signing-key-password' ]`
+	* `grails.plugin.springsecurity.saml.keyManager.passwords = ['certificate-alias':'signing-key-password']`
 * `grails.plugin.springsecurity.saml.keyManager.defaultKey`
 	* Set to the ‘certificate-alias’ from the previous step.
-	* Example: `grails.plugin.springsecurity.saml.keyManager.defaultKey = 'certificate-alias'`
+	* `grails.plugin.springsecurity.saml.keyManager.defaultKey = 'certificate-alias'`
 * `grails.plugin.springsecurity.saml.maxAuthenticationAge`
 	* Set this value to the amount of time (in seconds) that is configured in the conditional access policy created in the “Setting a Session Timeout Period” section.
 	* This setting should not be lower than the session time configured in the conditional access policy or you will receive error messages when accessing the application.
 	* So you don’t have to bust out the calculator app: 3600 seconds = 1 hour
+	* `grails.plugin.springsecurity.saml.maxAuthenticationAge = 3600`
 * `grails.plugin.springsecurity.saml.metadata.sp.file`
-	* Set to the file location, on the server, of your service provider XML file created earlier. 
+	* Set to the file location, on the server, of your service provider XML metadata file created earlier. 
 	* **NOTE:** You do not need to prepend it with “file:”.
-	* Example: `/u01/app/tomcat/saml/banner-stuss-test-sp.xml`
+	* `grails.plugin.springsecurity.saml.metadata.sp.file = /u01/app/tomcat/saml/banner-stuss-test-sp.xml`
 * `grails.plugin.springsecurity.saml.metadata.providers`
-	* Set to the file location, on the server, of your identity provider XML file created earlier.
+	* Set to the file location, on the server, of your identity provider XML metadata file created earlier.
 	* This is an associative array. The key should be “eis” and the value set to the file location.
-	* Example: `[eis:'/u01/app/tomcat/saml/banner-entra-idp.xml']`
-* grails.plugin.springsecurity.saml.metadata.defaultIdp
+	* `grails.plugin.springsecurity.saml.metadata.providers = [eis:'/u01/app/tomcat/saml/banner-entra-idp.xml']`
+* `grails.plugin.springsecurity.saml.metadata.defaultIdp`
 	* Set this to the entity ID of the IDP (Entra). 
-	* This can be found in the “Set up *Entra App Name*” box of the Entra SAML setup. The URL will start with https://sts.windows.net and include your Entra tenant ID.
-	* Example: `https://sts.windows.net/*entra-tenant-id*/`
+	* This can be found in the “Set up *Entra App Name*” box of the Entra SAML setup as the "Microsoft Entra Identifier". The URL will start with https://sts.windows.net and include your Entra tenant ID.
+	* `grails.plugin.springsecurity.saml.metadata.defaultIdp = https://sts.windows.net/*entra-tenant-id*/`
 * `grails.plugin.springsecurity.saml.metadata.sp.defaults`
 	* This is an associative array of settings for the service provider.
-local
-	* Set to true. No quotes are needed for booleans.
-	* Example: `local: true`
-* `alias`
-	* Set to the entity ID of your SSB application. 
-	* This is the value of “Identifier (Entity ID)” in the “Basic SAML Configuration” section of the Entra SAML configuration. It is also referenced in the service provider XML file.
-	* Ex. alias: `'ssb-app-entityid-sp'`
-* `securityProfile`
-	* Set to ‘metaiop’.
-	* Since we’re using a self-signed certificate, we need to use “metaiop”. According to [this site](https://docs.spring.io/spring-security-saml/docs/current/reference/html/security.html#configuration-security-profiles-metaiop), “MetaIOP mode certificates are not checked for expiration or revocation.”
-	* Example: `securityProfile: 'metaiop'`
-* `signingKey`
-	* Set to the alias of the certificate within the Java keystore.
-	* Example: `signingKey: 'certificate-alias'`
-* `encryptionKey`
-	* Set to the alias of the certificate within the Java keystore.
-	* Ex. `encryptionKey: 'certificate-alias'`
-* `tlsKey`
-Set to the alias of the certificate within the Java keystore.
-	* Example: `tlsKey: 'certificate-alias'`
-* `requireArtifactResolveSigned`
-	* Set to false.
-	* Example: `requireArtifactResolveSigned: false`
-* `requireLogoutRequestSigned`
-	* Set to false.
-	* Example: `requireLogoutRequestSigned: false`
-* `requireLogoutResponseSigned`
-	* Set to false.
-	* Example: `requireLogoutResponseSigned: false`
+	* `local`
+		* Set to `true`. No quotes are needed for booleans.
+		* `local: true`
+	* `alias`
+		* Set to the entity ID of your SSB application. 
+		* This is the value of “Identifier (Entity ID)” in the “Basic SAML Configuration” section of the Entra SAML configuration. It is also referenced in the service provider XML metadata file.
+		* `alias: 'ssb-app-entityid-sp'`
+	* `securityProfile`
+		* Set to `metaiop`.
+		* `securityProfile: 'metaiop'`
+	* `signingKey`
+		* Set to the alias of the certificate within the Java keystore.
+		* `signingKey: 'certificate-alias'`
+	* `encryptionKey`
+		* Set to the alias of the certificate within the Java keystore.
+		* `encryptionKey: 'certificate-alias'`
+	* `tlsKey`
+		* Set to the alias of the certificate within the Java keystore.
+		* `tlsKey: 'certificate-alias'`
+	* `requireArtifactResolveSigned`
+		* Set to `false`.
+		* `requireArtifactResolveSigned: false`
+	* `requireLogoutRequestSigned`
+		* Set to `false`.
+		* `requireLogoutRequestSigned: false`
+	* `requireLogoutResponseSigned`
+		* Set to `false`.
+		* `requireLogoutResponseSigned: false`
+* Save the file and redeploy using your preferred deployment method.
 
-Save the file and redeploy using your preferred deployment method.
+## Banner Admin Pages and Banner Access Management
 
+Banner Admin Pages and Banner Access Management both follow very similar procedures with only slight variations. Unlike the Application Navigator and Self-Service apps, you will not be editing an app’s .groovy file. These two apps are commonly deployed and configured through ESM. If you use ESM, I recommend checking out the Single Sign-On Handbook for more information. I will try to cover ESM and manual deployment. 
+
+Please note that both apps use the WorkSpaces version of the apps (BannerAdmin.ws.war and BannerAccessMgmt.ws.war) for SSO. You will be configuring those apps and not the plain ones (BannerAdmin.war and BannerAccessMgmt.war). 
+
+Another note is that the “Federation Metadata XML” file does not seem to work with these two apps as the identity provider XML metadata file. Instead, use the sample identity provider XML metadata file included in this project.
+
+If you use the “bansecr” account with Banner Access Management, you will need to have this account synced or manually created in your Microsoft Entra tenant.
+
+### Configuring Entra (Banner Admin Pages)
+
+Use the following settings for creating an app in Entra:
+
+* Entity ID = `banner-admin-test-sp` (this can be whatever you want, just make it unique)
+* Reply URL (ACS URL) = `https://server.univ.edu:8443/BannerAdmin.ws/saml/SSO`
+    * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
+    * Modify the URL and port to point to your server.
+* Logout URL = `https://server.univ.edu:8443/BannerAdmin.ws/saml/SingleLogout`
+    * This URL is case-sensitive.
+    * Modify the URL and port to point to your server.
+* Include the following attribute:
+    * `UDC_IDENTIFIER`
+
+### Configuring Entra (Banner Access Management)
+
+Use the following settings for creating an app in Entra:
+
+* Entity ID = `banner-accessmgmt-test-sp` (this can be whatever you want, just make it unique)
+* Reply URL (ACS URL) = `https://server.univ.edu:8443/BannerAccessMgmt.ws/saml/SSO`
+    * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
+    * Modify the URL and port to point to your server.
+* Logout URL = `https://server.univ.edu:8443/BannerAccessMgmt.ws/saml/SingleLogout`
+    * This URL is case-sensitive.
+    * Modify the URL and port to point to your server.
+* Include the following attribute:
+    * `UDC_IDENTIFIER`
+
+### Configuring Banner Admin Pages and Banner Access Management
+
+#### Service Provider XML Metadata File
+
+For Banner Admin Pages and Banner Access Management, the service provider XML metadata file creation process will be the same as the process for Banner 9 Self-Service apps and Application Navigator. Follow the "Creating a Service Provider XML Metadata File" instructions in this guide.
+
+If you are using ESM to deploy these two apps, you will need to store this file on your build server (usually JobSub). Make sure it is readable by ESM.
+
+Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
+
+#### Identity Provider XML Metadata File
+
+Banner Admin Pages and Banner Access Management cannot use the Federation Metadata XML file downloaded from Entra, in my testing. Instead, you must use the sample XML metadata file from the `examples` directory of this project. Please see the "Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service" section of "Creating an Identity Provider XML Metadata File" for more instructions.
+
+This file should be stored in the same location as the service provider XML metadata file if you are using ESM. Make sure it is readable by ESM. 
+
+Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
+
+#### Deploying with ESM
+
+* Before signing in to ESM, place the service provider metadata and identity provider metadata files somewhere on your build server. Commonly, this is on JobSub. For example, I created a `saml_configuration` directory within the `BANNER9WAR` directory.
+    * Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`  
+    * Make sure the new directory and files are owned by the same user and group that the other directories are owned by.
+        * `chown user:group -R saml_configuration`
+    * Failure to do this can lead to failed builds.
+* The keystore file will need to be stored somewhere on your app server that is readable by Tomcat.  
+    * Ex. `/u01/app/tomcat/saml`
+* Login to ESM and select your environment
+* Go to “Env Settings”
+* Scroll to the “Banner Administrative Pages Configuration” or “Banner Access Management Configuration” section
+* Fill in the SAML configuration information
+    * `Login Authentication Method`
+        * Choose “SAML SSO”
+    * `Identity Service Url`
+        * This field is for CAS users. You may leave this field empty if you are using SAML.
+    * `SAML Configuration Files Directory (full path, Jobsub)`
+        * Enter the full path to the directory where the service provider metadata, identity provider metadata, and keystore files reside. This is usually on the Jobsub server.
+    * `SAML Service Provider Metadata File Name`
+        * Enter the file name of the service provider metadata file. Only the file name is needed, not the full path.
+    * `SAML Identity Provider Metadata File Name`
+        * Enter the file name of the identity provider metadata file. Only the file name is needed, not the full path.
+    * `SAML Keystore File Name (full path, App Server)`
+        * Enter the full path of the keystore file on the app server. The app server is the server hosting Banner Admin Pages or Banner Access Management.
+        * Ex. `/u01/app/tomcat/saml/samlkeystore.jks`
+    * `SAML Keystore Password`
+        * Enter the password to the SAML keystore. A second field will appear once you start entering the password. Retype the password in the second field to confirm the password.
+    * `SAML Signing Key Alias`
+        * Enter the alias of the certificate within the Java keystore.
+    * `SAML Signing Key Password`
+        * Enter the password for the signing certificate in the Java keystore. You will need to enter the password twice to confirm the password.
+    * Application Navigator URL
+        * This field is only located under the “Banner Administrative Pages Configuration” section.
+        * Enter the URL to your Application Navigator install.
+* Click Save
+* Deploy Banner Admin Pages and Banner Access Management like you normally would using ESM. ESM will bundle the needed configuration and files into the WAR file.
+
+#### Manual Configuration
+
+> **NOTE:** <br>
+> Since manual deployment may not be the same for every institution, I will only cover the broad view of what needs to be edited and configured. Adapt these instructions to your manual deployment methods.
+
+* The SAML configuration files for Banner Admin Pages and Banner Access Management can be found in the following locations:
+    * `/$CATALINA_HOME/webapps/BannerAdmin.ws/WEB-INF/classes`
+    * `/$CATALINA_HOME/webapps/BannerAccessMgmt.ws/WEB-INF/classes`
+* Place the service provider XML file, identity provider XML file, and Java keystore within the “classes” directory. 
+* Edit the `config.properties` file
+    * `saml.keystore`
+        * Enter the full path of the SAML keystore’s location on the app server. Prepend it with “file://”.
+            * Ex. `file:///u01/app/tomcat/saml/samlkeystore.jks`
+    * `saml.keystore.password`
+        * Enter the password for the Java keystore
+    * `saml.logout.success.url`
+        * Keep the default location of ${webapp.location}/saml/logout
+    * `saml.sign.key.alias`
+        * Enter the alias of the signing certificate within the Java keystore
+    * `saml.sign.key.password`
+        * Enter the password of the signing certificate within the Java keystore
+    * `saml.sp.metadata.filename`
+        * Enter the file name of the service provider XML file within the “classes” directory. You only need to enter the file name, not the full path.
+    * `saml.idp.metadata.filename`
+        * Enter the file name of the identity provider XML file within the “classes” directory. You only need to enter the file name, not the full path.
+* Save the `config.properties` file.
+* Modify applicationContext.xml
+    * This file is located in the “WEB-INF” directory. A preconfigured version for SAML can be found in “applicationContext_saml.xml”. 
+Since you will be using SAML, copy the contents of “applicationContext_saml.xml” to “applicationContext.xml”, or you can overwrite the file using the copy command.
+        * `cp applicationContext_saml.xml applicationContext.xml`
+* Save the file
+* Redeploy the application using your preferred deployment method. If you’re just editing the files in the unpacked install location, reboot Tomcat and the new configuration will take effect. If you would like to modify the WAR file, see the "Configuring SSOManager" instructions in the "Banner 8 Self-Service" section for a relevant guide.
+
+## Banner 8 Self-Service
+
+### Introduction
+
+Banner 8 Self-Service uses the SSOManager app to facilitate single sign-on. SSOManager is part of the Banner Enterprise Identity Services (BEIS) package. Documentation for SSOManager can be found within the BEIS documentation.
+
+Configuring SSOManager requires that the WAR file is unpacked, edited, then repacked. Doing so requires that Java (and the jar executable) is installed on the machine that you use to modify the WAR file.
+
+### Configuring Entra
+
+Use the following settings for creating an app in Entra:
+
+* Entity ID = `banner-ssb8-test-sp` (this can really be whatever you want, just make it unique)
+    * The BEIS documentation states that the entity ID must be “ssomanager”, but I’ve had success setting it to something different. If you have a TEST and PROD instance, you’ll need unique values for each anyway. 
+* Reply URL (ACS URL) = `https://server.univ.edu:8445/ssomanager/saml/SSO`
+    * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
+    * Modify the URL and port to point to your server.
+* Logout URL = `https://server.univ.edu:8445/ssomanager/saml/SingleLogout`
+    * This URL is case-sensitive.
+    * Modify the URL and port to point to your server.
+* Include the following attribute:
+    * `UDC_IDENTIFIER`
+
+### Service Provider XML Metadata File
+
+Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the "Creating a Service Provider XML Metadata File" instructions in this guide. 
+
+Store this file to be used in the "Configuring SSOManager" section.
+
+### Identity Provider XML Metadata File
+
+The Federation Metadata XML metadata file downloaded from Entra did not work with SSOManager when I tested it. Instead, I used the sample IDP XML metadata file found in the `examples` directory of this project. Please see the "Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service" section of "Creating an Identity Provider XML Metadata File" for more instructions.
+
+Store this file to be used in the "Configuring SSOManager" section.
+
+### Configuring SSOManager
+
+* Copy the “ssomanager.war” file to another location on a local machine or the server. 
+* Unpack the WAR file using the following command:
+    * `java xvf ssomanager.war`
+* Copy the Java keystore to the ssomanager/WEB-INF/classes directory and rename it to samlKeystore.jks (with an uppercase K)
+    * `cp samlkeystore.jks ssomanager/WEB-INF/classes/samlKeystore.jks`
+    * Overwrite the old file when prompted
+    * **NOTE:** If you don’t want to rename the file, just edit the filename in the securityContext.xml file.
+* Edit the securityContext.xml file
+    * Find the bean with id=”keyManager”
+        * Edit the following info surrounded in brackets (remove the brackets):
+            ```xml
+                <bean id="keyManager" class="org.springframework.security.saml.key.JKSKeyManager">
+                    <constructor-arg value="classpath:samlKeystore.jks"/>
+                    <constructor-arg type="java.lang.String" value="[keystore-password]"/>
+                    <constructor-arg>
+                        <map>
+                            <entry key="[certificate-alias]" value="[private-key-password]"/>
+                        </map>
+                    </constructor-arg>
+                    <constructor-arg type="java.lang.String" value="[certificate-alias]"/>
+                </bean>
+            ```
+* Find the bean with class=”org.springframework.security.saml.metadata.ExtendedMetadata”
+Edit the property with name=”signingKey”. Set the value attribute to your certificate’s alias.
+	* `<property name="signingKey" value="banner-saml-sp"/>`
+* Find the bean with id=”webSSOprofileConsumer”
+	* Replace with the following lines and set the maxAuthentication age (in seconds) to match your Entra session timeout period.
+		```xml
+		<bean id="webSSOprofileConsumer" class="org.springframework.security.saml.websso.WebSSOProfileConsumerImpl" lazy-init="true">
+      		<property name="maxAuthenticationAge" value="3600" />
+		</bean>
+		```
+* Copy the identity provider XML file to the ssomanager/WEB-INF/classes directory.
+	* The “Federation Metadata XML” file from the Entra SAML configuration site will work here.
+* Rename the identity provider XML file to idp-metadata.xml and overwrite the old file.
+	* `mv entra-idp-metadata.xml idp-metadata.xml`
+* Repack the WAR file
+	* Navigate to the directory where the WAR file is stored
+	* Use the following command to repack the WAR file:
+		* `jar uvf ssomanager.war WEB-INF`
+* Deploy the new version of ssomanager.war
+* Once SSOManager is done deploying, access the SSOManager configuration website.
+	* Go to the “SSB Configuration” tab
+	* Set the mode to “SAML 2.0”
+	* Set UDC ID Indicator to “Cookie”
+	* Set UDC ID Key to “UDC_IDENTIFIER”
+* Click Save
+
+### Update GUACONF
+
+* Go to Banner Admin Pages
+* Open GUACONF
+* Select GLOBAL for the Application ID
+* On the Configurations tab, set banner8.SS.url to:
+	* `https://server.univ.edu:8445/ssomanager/saml/login?relayState=/c/auth/SSB?pkg=`
+	* Modify the URL and port to point to your server.
+* On the Self-Service Parameters tab, set the following:
+	* `IDMLOGINURI`
+		* Set to the Login URL found in the Entra SAML configuration
+			* Ex. `https://login.microsoftonline.com/<tenant-id>/saml2`
+			* Set the <tenant-id> to your Entra tenant ID.
+	* `IDMLOGOUTURI`
+		* Set to the SSOManager logout URL
+			* Ex. https://server.univ.edu:8445/ssomanager/saml/logout
+			* This URL is case-sensitive.
+			* Modify the URL and port to point to your server.
+* Click Save 
+
+## AppXtender/AppEnhancer (Banner Document Managment)
+
+OpenText AppXtender is an app that integrates with Banner Document Management. Recently, the app was renamed to AppEnhancer. For this guide, I will refer to it as AppXtender. Version 20.4 of AppXtender was used to write this guide. Other versions may have different instructions. Please refer to the version’s documentation if these instructions do not work.
+
+To get AppXtender working with Entra, you must first install the SSO files. Instructions to download and install the files can be found in the Ellucian documentation linked in step 1.
+
+### Configuring AppXtender
+
+* When creating the Entra application, add the following URL as the “Reply URL (Assertion Consumer Service URL)”. Modify as needed for your server.
+	* Ex. `https://appxtender.univ.edu/AppXtender/BdmSamlSso`
+* Install the BDM SSO Files
+	* This is already well covered by Ellucian in their documentation. Please visit the [this link](https://resources.elluciancloud.com/bundle/banner_bdm_acn_install/page/t_install_bdm_sso_files.html) for more information.
+* Follow the Ellucian documentation to edit the “Login.cshtml” and “Index.cshtml” file. 
+* Copy the PFX keystore created in the “Creating a PKCS #12 version of the Java Keystore” section to the AppXtender install location.
+* Locate the “bdm.sso.config” file within the AppXtender install location. Edit the following tags:
+	* `SsoMode`
+		* Set to “SAML2”
+		* Ex. `<SsoMode>SAML2</SsoMode>`
+	* `IdpSsoUrl`
+		* Set to the Login URL found in Box 4 of the Entra SAML configuration page. You can also use the URL in the example, but make sure to replace the tenant ID with your own.
+		* Ex. `<IdpSsoUrl>https://login.microsoftonline.com/<tenant-id>/saml2</IdpSsoUrl>`
+	* `ServiceProviderId`
+		* Set to the entity ID of the Entra application. This can be found in Box 1 of the Entra SAML configuration page.
+		* Ex. `<ServiceProviderId>appxtender</ServiceProviderId>`
+	* `EncryptedAssertions`
+		* Set to false
+		* Ex.`<EncryptedAssertions>false</EncryptedAssertions>`
+	* IdpPublicKey
+		* Download the “Certificate (Raw)“ file from Box 3 in the Entra SAML configuration page. 
+		* Rename the file to “entra-idp.cer” or whatever you’d like. Place this file in the AppXtender install directory.
+		* Ex. `<IdpPublicKey>entra-idp.cer</IdpPublicKey>`
+	* IdpPublicKeyPassword
+		* Leave this empty as the downloaded certificate file from Entra has no password.
+		* Ex. `<IdpPublicKeyPassword></IdpPublicKeyPassword>`
+	* SpPrivateKey
+		* Enter the PFX file that was copied earlier to the AppXtender install directory.
+		* Ex. `<SpPrivateKey>entra-idp.cer</SpPrivateKey>`
+	* SpPrivateKeyPassword
+		* Enter the password of the PFX file.
+		* Ex. `<SpPrivateKeyPassword>keystorepassword</SpPrivateKeyPassword>`
+	* ArtifactServiceUrl
+		* Enter the URL for AppXtender
+		* Ex. `<ArtifactServiceUrl>https://appxtender.univ.edu/AppXtender</ArtifactServiceUrl>`
+	* UDCIDAttributeName
+		* Set to the name of the attribute being sent over from Entra. This is commonly set to “UDC_IDENTIFIER”.
+		* Ex. `<UDCIDAttributeName>UDC_IDENTIFIER</UDCIDAttributeName>`
+* Save the “bdm.sso.config” file.
+* Restart IIS
+* Use the following URL format to access the site via SSO:
+	* Ex. `https://<appxtenderservername>/AppXtender/DataSources/ <Datasourcename>/?sso=true&DSN=<Datasourcename>`
+
+### Configuring SSO Integration with Banner and AppXtender
+* Go to EXAINST in Banner Admin Pages
+* Set the ApplicationXtender Web Access Root value:
+	* Modify the URL and port to point to your AppXtender instance 
+	* Ex. `https://appxtender.univ.edu/AppXtender/ISubmitQuery.aspx?sso=true`
