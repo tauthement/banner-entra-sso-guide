@@ -171,15 +171,16 @@ This is a two-step process. You will first need to export the public certificate
 1. Export the public certificate using the following command:
 	
 	```
-	keytool -export -alias banner-saml-sp -keystore samlkeystore.jks -file banner-saml-sp.pem
+	keytool -export -alias banner-saml-sp 
+		-keystore samlkeystore.jks -file banner-saml-sp.pem
 	```
-2. A file named “banner-saml-sp.pem” will be created.
+2. A file named `banner-saml-sp.pem` will be created.
 3. Convert the PEM file to X.509 format using the following command:
 	
 	```
 	keytool -printcert -rfc -file banner-saml-sp.pem > banner-saml-sp.crt
 	````
-4. A file named “banner-saml-sp.crt” will be created.
+4. A file named `banner-saml-sp.crt` will be created.
 5. This will be used as your service provider certificate in your service provider XML metadata file.
 
 ## Creating a Service Provider XML Metadata File
@@ -343,7 +344,7 @@ The following settings will be broken down by the sections within the .groovy fi
 	* Ex. `grails.plugin.springsecurity.saml.metadata.providers = [eis:'/u01/app/tomcat/saml/banner-entra-idp.xml']`
 * `grails.plugin.springsecurity.saml.metadata.defaultIdp`
 	* Set this to the entity ID of the identity provider (Entra). 
-	* This URL can be found in the “Set up *Entra App Name*” box of the Entra SAML setup as the "Microsoft Entra Identifier". The URL will start with https://sts.windows.net and include your Entra tenant ID.
+	* This URL can be found in the “Set up *Entra App Name*” box of the Entra SAML setup as the `Microsoft Entra Identifier`. The URL will start with https://sts.windows.net and include your Entra tenant ID.
 	* Ex. `grails.plugin.springsecurity.saml.metadata.defaultIdp = https://sts.windows.net/*entra-tenant-id*/`
 * `grails.plugin.springsecurity.saml.metadata.sp.defaults`
 	* This is an associative array of settings for the service provider.
@@ -576,7 +577,8 @@ Store this file to be used in the "Configuring SSOManager" section.
     * **NOTE:** If you don’t want to rename the file, just edit the filename in the securityContext.xml file.
 4. Edit the `securityContext.xml` file
     * Find the bean with `id=”keyManager”`
-        * Edit the following info surrounded in brackets (remove the brackets):
+        * Edit the following info surrounded in brackets. Remove the brackets.
+		
             ```xml
                 <bean id="keyManager" class="org.springframework.security.saml.key.JKSKeyManager">
                     <constructor-arg value="classpath:samlKeystore.jks"/>
@@ -590,7 +592,8 @@ Store this file to be used in the "Configuring SSOManager" section.
                 </bean>
             ```
 5. Find the bean with `class=”org.springframework.security.saml.metadata.ExtendedMetadata”`
-	* Edit the property with `name=”signingKey”`. Set the value attribute to the certificate alias.
+	* Edit the property with `name=”signingKey”`. 
+	* Set the value attribute to the certificate alias. Remove the brackets.
 
 		```xml
 		<property name="signingKey" value="[certificate-alias]"/>
