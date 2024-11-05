@@ -19,10 +19,11 @@
 	* [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service)
 * [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator)
 	* [Configuring Entra for Banner 9 Self-Service Apps and Application Navigator](#configuring-entra-for-banner-9-self-service-apps-and-application-navigator)
-	* [Java Keystore File](#java-keystore-file)
-	* [Service Provider XML Metadata File](#service-provider-xml-metadata-file)
-	* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file)
-	* [Application Groovy File](#application-groovy-file)
+	* [Configuring Banner 9 Self-Service Apps and Application Navigator](#configuring-banner-9-self-service-apps-and-application-navigator)
+		* [Java Keystore File](#java-keystore-file)
+		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file)
+		* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file)
+		* [Application Groovy File](#application-groovy-file)
 * [Banner Admin Pages and Banner Access Management](#banner-admin-pages-and-banner-access-management)
 	* [Configuring Entra for Banner Admin Pages](#configuring-entra-for-banner-admin-pages)
 	* [Configuring Entra for Banner Access Management](#configuring-entra-for-banner-access-management)
@@ -260,29 +261,31 @@ Use the following settings for creating an app in Entra:
 * Include the following attribute:
     * `UDC_IDENTIFIER`
 
-### Java Keystore File
+### Configuring Banner 9 Self-Service Apps and Application Navigator
+
+#### Java Keystore File
 
 Please refer to the "Creating Keystores" section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group.
 
-### Service Provider XML Metadata File
+#### Service Provider XML Metadata File
 
 Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the "Creating a Service Provider XML Metadata File" instructions in this guide. 
 
 The file will need to be stored on the same server as your application and be readable by Tomcat. For example, I stored the file at `/u01/app/tomcat/saml` and made the `tomcat` user and group the owner of the directory and the files within it. I store the identity provider XML metadata and Java keystore files in there as well.
 
-### Identity Provider XML Metadata File
+#### Identity Provider XML Metadata File
 
 For the Banner 9 Self-Service apps and Application Navigator, I had luck with using the "Federation Metadata XML" file downloaded from Entra. Please see the "Banner 9 Self-Service Apps and Application Navigator" section of "Creating an Identity Provider XML Metadata File" for more instructions. If those files don't work for you, please try manually creating the identity provider XML metadata file using the sample file in the `examples` directory of this project.
 
 This file should be stored in the same location as the service provider XML metadata file and Java keystore.
 
-### Application Groovy File
+#### Application Groovy File
 	
 Each of these apps are configured using a .groovy file. If you've ever deployed a SSB 9 app, you should be familiar with these.
 
 The following settings will be broken down by the sections within the .groovy file.
 
-#### Authentication Provider Configuration 
+##### Authentication Provider Configuration 
 
 * `ssoEnabled`
 	* Set to `true` to enable single sign-on for the application.
@@ -295,14 +298,14 @@ The following settings will be broken down by the sections within the .groovy fi
 	* Set to `UDC_IDENTIFIER`
 	* `authenticationAssertionAttribute = 'UDC_IDENTIFIER'`
 
-#### CAS Configuration
+##### CAS Configuration
 
 * `active`
 	* Set to `false`
 	* Since SAML will be used, make sure CAS is disabled. Double check this setting if you were previously using CAS.
 	* `active = false`	
 
-#### SAML Configuration
+##### SAML Configuration
 
 * `grails.plugin.springsecurity.saml.active`
 	* Set this to `true` to enable SAML for the app.
