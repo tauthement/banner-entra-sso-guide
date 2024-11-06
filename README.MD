@@ -246,6 +246,8 @@ In my testing, these apps support using the "Federation Metadata XML" file that 
 
 An sample Student Self-Service groovy file is available in the `examples` directory, but do not use the sample file for all applications. It is only for demonstration purposes. The configuration files can change between releases and each app has different configurations. However, the SAML configuration should be fairly similar in all of the apps. You must modify the groovy file delivered with the version of the app being deployed.
 
+The following Banner 9 Self-Service apps have been tested with these instructions: Communication Management, Employee SSB, Extensibility, Faculty SSB, Finance SSB, General SSB, Student Registration SSB, and Student SSB. Application Navigator is not a SSB app, but it has a very similar configuration.
+
 ### Configuring Entra for Banner 9 Self-Service Apps and Application Navigator
 
 Use the following settings for creating an app in Entra:
