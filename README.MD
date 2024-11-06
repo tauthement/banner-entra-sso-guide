@@ -17,7 +17,7 @@
 * [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file)
 	* [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator)
 	* [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service)
-* [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator)
+* [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator-1)
 	* [Configuring Entra for Banner 9 Self-Service Apps and Application Navigator](#configuring-entra-for-banner-9-self-service-apps-and-application-navigator)
 	* [Configuring Banner 9 Self-Service Apps and Application Navigator](#configuring-banner-9-self-service-apps-and-application-navigator)
 		* [Java Keystore File](#java-keystore-file)
