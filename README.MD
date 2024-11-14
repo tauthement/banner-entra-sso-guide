@@ -24,9 +24,12 @@
 		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file)
 		* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file)
 		* [Application Groovy File](#application-groovy-file)
+	* [Whitelisting Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox)
 * [Banner Admin Pages and Banner Access Management](#banner-admin-pages-and-banner-access-management)
 	* [Configuring Entra for Banner Admin Pages](#configuring-entra-for-banner-admin-pages)
 	* [Configuring Entra for Banner Access Management](#configuring-entra-for-banner-access-management)
+	* [Configuring Tomcat's Cookie Processor Component and Session Timeout](#configuring-tomcats-cookie-processor-component-and-session-timeout)
+	
 	* [Configuring Banner Admin Pages and Banner Access Management](#configuring-banner-admin-pages-and-banner-access-management)
 		* [Java Keystore File](#java-keystore-file-1)
 		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file-1)
@@ -87,7 +90,7 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 			* Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
 			* The URL is case-sensitive.
 			* Modify the URL and port to point to your server.
-		* Enter a URL in the “Logout URL” field. This URL will be used to send data to the app in the event of a Single Logout (SLO) being triggered. If you don’t use SLO, you may ignore this field. The URL will follow the example below. Replace `entity-id` with the Entity ID entered in the “Identifier” field. Below is just an example. Each Banner app section will include more specific examples.
+		* Enter a URL in the “Logout URL” field. This URL will be used to send data to the app in the event of a Single Logout (SLO) being triggered. If you don't use SLO, you may ignore this field. The URL will follow the example below. Replace `entity-id` with the Entity ID entered in the “Identifier” field. Below is just an example. Each Banner app section will include more specific examples.
 			* Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SingleLogout/alias/*entity-id*`
 		* Click Save
 	* **Box 2 - Attributes & Claims**
@@ -96,7 +99,7 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 		* Delete all of the default claims under “Additional Claims”. None of these will be used in the app.
 		* Click “Add new claim” at the top of the page. 
 		* Enter “UDC_IDENTIFIER” in the Name field. It must be in all caps. 
-			* This is the default attribute shipped by Ellucian for all apps. The name can be changed in the respective SSB app’s groovy file under the “authenticationAssertionAttribute” setting. You will need this value synced to your Entra tenant. If you’re unsure if the value is synced, contact your Entra administrators. This value will be used to identify the user in the Banner DB. 
+			* This is the default attribute shipped by Ellucian for all apps. The name can be changed in the respective SSB app's groovy file under the “authenticationAssertionAttribute” setting. You will need this value synced to your Entra tenant. If you're unsure if the value is synced, contact your Entra administrators. This value will be used to identify the user in the Banner DB. 
 		* Leave “Namespace” empty.
 		* Select “Attribute” for “Source”
 		* For “Source Attribute”, select the attribute which your UDCID is being synced to.
@@ -106,7 +109,7 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 		* Click on the Download link next to “Federation Metadata XML”.
 			* Save and rename this file to be relevant to the app you will be deploying. This will be the identity provider XML metadata file for some of the apps. Each app will have its own identity provider XML metadata file. 
 		* Click Edit at the top right of the “SAML Certificates” box.
-			* Here you will find what will be referred to as your identity provider certificate. Each Entra app will have its own identity provider certificate. If you downloaded the identity provider XML metadata file, you don’t need to download the certificate since it’s already included in the XML file. However, if you want to manually create your own identity provider XML metadata files, you will need to download the identity provider certificate. 
+			* Here you will find what will be referred to as your identity provider certificate. Each Entra app will have its own identity provider certificate. If you downloaded the identity provider XML metadata file, you don't need to download the certificate since it's already included in the XML file. However, if you want to manually create your own identity provider XML metadata files, you will need to download the identity provider certificate. 
 				* In the list of certificates, click on the three dots of the Active certificate.
 				* Click on “PEM certificate download” to download the X.509 version of the certificate. This will be used in the setup of the applications.
 					* To keep track of things, I recommend renaming the file similar to your entity ID.
@@ -115,7 +118,7 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 		* For “Signing Algorithm”, select “SHA-256”. 
 		* Under “Notification Email Addresses,” add any email addresses that should be alerted when the certificate is about to expire. You will need to update the certificate in the identity provider XML metadata file when it expires.
 	* **Box 4 - Set up "Entra App Name"**
-		* There’s nothing to configure here. The URLs listed here will be used later on in the app configuration files. You may want to document them, or come back to them later.
+		* There's nothing to configure here. The URLs listed here will be used later on in the app configuration files. You may want to document them, or come back to them later.
 	* **Box 5 - Test Single Sign-on with "Entra App Name"**
 		* Ignore this step for now. If the Banner app is not configured yet, this test will not work. You can use this after the Banner app is setup.
 
@@ -123,9 +126,11 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 
 You will need to create a Conditional Access policy to configure the session timeout period for Banner apps to avoid getting errors such as “Invalid username/password” or “Session Initialization Failed”. When you configure your Banner Admin and Banner Self-Services apps, you should set the variable called “maxAuthenticationAge” (in seconds) to match the timeout period you set here. For example, 1 hour = 3600 seconds. The “maxAuthenticationAge” variable should not be lower than the timeout period set in Entra or you will get errors. The current default session period for Entra is 90 days. The lowest amount of time you can set is one hour.
 
-Please refer to Microsoft’s documentation on how to [configure adaptive session lifetime policies](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-session-lifetime). You should only need to set up Policy 1 (Sign-in Frequency Control). Policy 2 and 3 are optional. 
+Please refer to Microsoft's documentation on how to [configure adaptive session lifetime policies](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-session-lifetime). You should only need to set up Policy 1 (Sign-in Frequency Control). Policy 2 and 3 are optional. 
 
 You will need to add new Entra applications to the conditional access policy each time an application is created. If you have multiple applications to create, I suggest creating the Entra applications first then adding multiple applications to the policy all at once to save time.
+
+Tomcat must also be configured to match the session timeout. Please see the [Configuring Tomcat's Cookie Processor Component and Session Timeout](#configuring-tomcats-cookie-processor-component-and-session-timeout) section to configure Tomcat.
 
 ## Creating Keystores
 
@@ -220,7 +225,7 @@ In my testing, these apps support using the "Federation Metadata XML" file that 
 
 1. Go to the Entra SAML configuration page
 2. In the “SAML Certificates” section, click Download next to "Federation Metadata XML”.
-3. Rename the downloaded file to a name of your choosing. Preferably one without spaces so you don’t have to escape any of the spaces later.
+3. Rename the downloaded file to a name of your choosing. Preferably one without spaces so you don't have to escape any of the spaces later.
 	* Ex. `banner-stuss-test-idp.xml`
 4. Store the file to a location on your server that is readable by your Tomcat server. This file location will be used in the SSB App Groovy File section.
 	* Ex. `/u01/app/tomcat/saml`
@@ -297,7 +302,7 @@ The following settings will be broken down by the sections within the .groovy fi
 * `authenticationProvider`
 	* Set it to `saml` to use SAML as the SSO protocol.
 	* **NOTE:** Use single quotes.
-	* `authenticationProvider = ‘saml’`
+	* `authenticationProvider = 'saml'`
 * authenticationAssertionAttribute
 	* Set to `UDC_IDENTIFIER`
 	* `authenticationAssertionAttribute = 'UDC_IDENTIFIER'`
@@ -327,7 +332,7 @@ The following settings will be broken down by the sections within the .groovy fi
 	* Refer to the passwords you stored when you created the keystore.
 	* Ex. `grails.plugin.springsecurity.saml.keyManager.storePass = 'keystore-password'`
 * `grails.plugin.springsecurity.saml.keyManager.passwords`
-	* Use an associative array with the alias of the certificate within the Java keystore as the key and the certificate’s signing key password.
+	* Use an associative array with the alias of the certificate within the Java keystore as the key and the certificate's signing key password.
 	* Ex. `grails.plugin.springsecurity.saml.keyManager.passwords = ['certificate-alias':'signing-key-password']`
 * `grails.plugin.springsecurity.saml.keyManager.defaultKey`
 	* Set to the `certificate-alias` from the previous step.
@@ -335,7 +340,7 @@ The following settings will be broken down by the sections within the .groovy fi
 * `grails.plugin.springsecurity.saml.maxAuthenticationAge`
 	* Set this value to the amount of time (in seconds) that is configured in the conditional access policy created in the “Setting a Session Timeout Period” section.
 	* This setting should not be lower than the session time configured in the conditional access policy or you will receive error messages when accessing the application.
-	* So you don’t have to bust out the calculator app: 3600 seconds = 1 hour
+	* So you don't have to bust out the calculator app: 3600 seconds = 1 hour
 	* Ex. `grails.plugin.springsecurity.saml.maxAuthenticationAge = 3600`
 * `grails.plugin.springsecurity.saml.metadata.sp.file`
 	* Set to the file location, on the server, of your service provider XML metadata file created earlier. 
@@ -381,9 +386,25 @@ The following settings will be broken down by the sections within the .groovy fi
 		* Ex. `requireLogoutResponseSigned: false`
 * Save the file and redeploy using your preferred deployment method.
 
+### Whitelisting Application Navigator in Mozilla Firefox
+
+Setting `SameSite=none` for Admin Pages' cookie breaks Mozilla Firefox's ability to load Admin Pages within Application Navigator's iframe, but there is a fix. Firefox's Enhanced Tracking Protection default setting of "Standard" doesn't allow for Admin Pages to load because of the cookie setting as well as Entra sending the `X-Frame-Options=deny` header in the response. We can get around this by whitelisting Application Navigator's URL in Firefox's Enhanced Tracking Protection settings.
+
+* Open Firefox's settings
+* Go to `Privacy & Security`
+* Click `Manage Exceptions...` 
+* In the `Address of website` field, enter the base URL of your Application Navigator server.
+    * Example: `https://appnav-test.univ.edu:8443`
+    * Add all instances of Application Navigator that your institution uses (ie. TEST, PROD).
+* Click `Add Exception`
+* Click `Save Changes`
+* Reload Application Navigator and try to load a form. 
+
+If your institution uses an MDM to manage computers, Firefox can be mass-configured to whitelist Application Navigator using the [EnableTrackingProtection](https://mozilla.github.io/policy-templates/#enabletrackingprotection) setting. Please speak to your MDM administrator about deploying the exception list.
+
 ## Banner Admin Pages and Banner Access Management
 
-Banner Admin Pages and Banner Access Management both follow very similar procedures with only slight variations. Unlike the Application Navigator and Self-Service apps, you will not be editing an app’s .groovy file. These two apps are commonly deployed and configured through ESM. If you use ESM, I recommend checking out the Single Sign-On Handbook for more information. I will try to cover ESM and manual deployment the best I can. 
+Banner Admin Pages and Banner Access Management both follow very similar procedures with only slight variations. Unlike the Application Navigator and Self-Service apps, you will not be editing an app's .groovy file. These two apps are commonly deployed and configured through ESM. If you use ESM, I recommend checking out the Single Sign-On Handbook for more information. I will try to cover ESM and manual deployment the best I can. 
 
 Please note that both apps use the WorkSpaces version of the apps (BannerAdmin.ws.war and BannerAccessMgmt.ws.war) for SSO. You will be configuring those apps and not the plain ones (BannerAdmin.war and BannerAccessMgmt.war). 
 
@@ -420,6 +441,42 @@ Use the following settings for creating an app in Entra:
     * Modify the URL and port to point to your server.
 * Include the following attribute:
     * `UDC_IDENTIFIER`
+
+### Configuring Tomcat's Cookie Processor Component and Session Timeout
+
+To ensure that Entra works with Admin Pages, you must configure Tomcat's cookie processor component. The SameSite attribute for the Admin Pages cookie will be set to "none", which allows a browser to send cookies for both cross-site and same site requests. 
+
+While this setting allows the site to work in Google Chrome and Microsoft Edge, it somewhat breaks compatibility with Mozilla Firefox. Please see the "[Whitelisting Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox)" section for a fix. Safari on macOS seems to be incompatible as well, but I have not been able to find a fix. So you may need to ask users to use Chrome, Edge, or Firefox instead.
+
+Configuring this component requires editing `context.xml` and `web.xml`, which can both be found in the `conf` directory of your Tomcat install. Make sure to restart Tomcat after editing these files for the change to take affect.
+
+More info can be found at Ellucian's knowledge base in [Article 000049779](https://elluciansupport.service-now.com/customer_center?id=kb_article_view&sysparm_article=000049779).
+
+#### context.xml
+
+Add the following line within the `<Context>` tags:
+
+```xml
+<CookieProcessor sameSiteCookies="none" />
+```
+
+#### web.xml
+
+Edit the `<session-config>` element to include the `<cookie-config>` element. Since we are using `SameSite=none` for the cookie, the [Secure attribute must be set](https://hacks.mozilla.org/2020/08/changes-to-samesite-cookie-behavior/) on the cookie. Setting the Secure attribute also requires that the [server uses HTTPS](https://medium.com/@yadav-ajay/using-httponly-and-secure-cookies-on-web-servers-how-to-do-it-52ccf0eabfb4).
+
+The `<http-only>` setting ensures that the cookie can only be used by the browser and not scripts.
+
+Make sure the value in `<session-timeout>` matches the [session timeout period](#setting-a-session-timeout-period) set in Entra. The value should be in minutes.
+
+```xml
+<session-config>
+    <session-timeout>60</session-timeout>
+    <cookie-config>
+		<http-only>true</http-only>
+		<secure>true</secure>
+    </cookie-config>
+</session-config>
+```
 
 ### Configuring Banner Admin Pages and Banner Access Management
 
@@ -495,7 +552,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 2. Place the service provider XML file, identity provider XML file, and Java keystore within the `classes` directory. 
 3. Edit the `config.properties` file
     * `saml.keystore`
-        * Enter the full path of the SAML keystore’s location on the app server. Prepend the path with `file://`.
+        * Enter the full path of the SAML keystore's location on the app server. Prepend the path with `file://`.
             * Ex. `file:///u01/app/tomcat/saml/samlkeystore.jks`
     * `saml.keystore.password`
         * Enter the password for the Java keystore.
@@ -523,7 +580,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 		cp applicationContext_saml.xml applicationContext.xml
 		```
 6. Save the file
-7. Redeploy the application using your preferred deployment method. If you’re just editing the files in the unpacked install location, reboot Tomcat and the new configuration will take effect. If you would like to modify the WAR file, see the "Configuring SSOManager" instructions in the "Banner 8 Self-Service" section for a relevant guide.
+7. Redeploy the application using your preferred deployment method. If you're just editing the files in the unpacked install location, reboot Tomcat and the new configuration will take effect. If you would like to modify the WAR file, see the "Configuring SSOManager" instructions in the "Banner 8 Self-Service" section for a relevant guide.
 
 ## Banner 8 Self-Service
 
@@ -537,7 +594,7 @@ Use the following settings for creating an app in Entra:
 
 * Entity ID = `banner-ssb8-test-sp`
 	* This can be whatever you want. Just make it unique to your Entra tenant.
-    * The BEIS documentation states that the entity ID must be “ssomanager”, but I’ve had success setting it to something different. If you have a TEST and PROD instance, you will need unique values for each anyway. 
+    * The BEIS documentation states that the entity ID must be “ssomanager”, but I've had success setting it to something different. If you have a TEST and PROD instance, you will need unique values for each anyway. 
 * Reply URL (ACS URL) = `https://server.univ.edu:8445/ssomanager/saml/SSO`
     * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
     * Modify the URL and port to point to your server.
@@ -577,7 +634,7 @@ Store this file to be used in the "Configuring SSOManager" section.
 	cp samlkeystore.jks ssomanager/WEB-INF/classes/samlKeystore.jks
 	```
     * Overwrite the old file when prompted
-    * **NOTE:** If you don’t want to rename the file, just edit the filename in the securityContext.xml file.
+    * **NOTE:** If you don't want to rename the file, just edit the filename in the securityContext.xml file.
 4. Edit the `securityContext.xml` file
     * Find the bean with `id=”keyManager”`
         * Edit the following info surrounded in brackets. Remove the brackets.
@@ -653,7 +710,7 @@ Store this file to be used in the "Configuring SSOManager" section.
 
 ## AppXtender/AppEnhancer (Banner Document Managment)
 
-OpenText AppXtender is an app that integrates with Banner Document Management. Recently, the app was renamed to AppEnhancer. I will refer to it as AppXtender since I used AppXtender 20.4 to write this guide. It looks like some of these settings may have changed in AppEnhancer, but I do not have an install to test it with. Please refer to your version’s documentation if these instructions do not work.
+OpenText AppXtender is an app that integrates with Banner Document Management. Recently, the app was renamed to AppEnhancer. I will refer to it as AppXtender since I used AppXtender 20.4 to write this guide. It looks like some of these settings may have changed in AppEnhancer, but I do not have an install to test it with. Please refer to your version's documentation if these instructions do not work.
 
 To get AppXtender working with Entra, you must first install the SSO files. Instructions to download and install the files can be found in the Ellucian documentation linked in the "Configuring AppXtender" section.
 
