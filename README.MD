@@ -191,7 +191,7 @@ This is a two-step process. You will first need to export the public certificate
 ## Creating a Service Provider XML Metadata File
 
 1. Download the example service provider XML metadata file.
-2. To edit this file, you will need the entity ID from “Box 1 - Basic SAML Configuration” of the Entra application setup. You will also need the service provider public certificate that was exported in the “Exporting the Service Provider Public Certificate” section.
+2. To edit this file, you will need the entity ID from “Box 1 - Basic SAML Configuration” of the Entra application setup. You will also need the service provider public certificate that was exported in the [Exporting the Service Provider Public Certificate](exporting-the-service-provider-public-certificate) section.
 3. Edit the following elements in the XML file.
 	* `<md:SingleSignOnService>`
 		* Set the `ID` and `entityID` attribute to be the same entity ID used in the Entra application setup (box 1 of the SAML setup).
@@ -283,7 +283,7 @@ The file will need to be stored on the same server as your application and be re
 
 #### Identity Provider XML Metadata File
 
-For the Banner 9 Self-Service apps and Application Navigator, I had luck with using the "Federation Metadata XML" file downloaded from Entra. Please see the "Banner 9 Self-Service Apps and Application Navigator" section of "Creating an Identity Provider XML Metadata File" for more instructions. If those files don't work for you, please try manually creating the identity provider XML metadata file using the sample file in the `examples` directory of this project.
+For the Banner 9 Self-Service apps and Application Navigator, I had luck with using the "Federation Metadata XML" file downloaded from Entra. Please see the [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions. If those files don't work for you, please try manually creating the identity provider XML metadata file using the sample file in the `examples` directory of this project.
 
 This file should be stored in the same location as the service provider XML metadata file and Java keystore.
 
@@ -481,7 +481,7 @@ Make sure the value in `<session-timeout>` matches the [session timeout period](
 
 #### Java Keystore File
 
-Please refer to the "Creating Keystores" section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group. This file does not need to be placed on the build server.  
+Please refer to the [Creating Keystores](#creating-keystores) section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group. This file does not need to be placed on the build server.  
 
 #### Service Provider XML Metadata File
 
@@ -493,7 +493,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 
 #### Identity Provider XML Metadata File
 
-Banner Admin Pages and Banner Access Management cannot use the "Federation Metadata XML" file downloaded from Entra, in my testing. Instead, you must use the sample XML metadata file from the `examples` directory of this project. Please see the "Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service" section of "Creating an Identity Provider XML Metadata File" for more instructions.
+Banner Admin Pages and Banner Access Management cannot use the "Federation Metadata XML" file downloaded from Entra, in my testing. Instead, you must use the sample XML metadata file from the `examples` directory of this project. Please see the [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions.
 
 This file should be stored in the same location as the service provider XML metadata file if you are using ESM. Make sure it is readable by ESM. 
 
@@ -579,7 +579,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 		cp applicationContext_saml.xml applicationContext.xml
 		```
 6. Save the file
-7. Redeploy the application using your preferred deployment method. If you're just editing the files in the unpacked install location, reboot Tomcat and the new configuration will take effect. If you would like to modify the WAR file, see the "Configuring SSOManager" instructions in the "Banner 8 Self-Service" section for a relevant guide.
+7. Redeploy the application using your preferred deployment method. If you're just editing the files in the unpacked install location, reboot Tomcat and the new configuration will take effect. If you would like to modify the WAR file, see the [Configuring SSOManager](#configuring-ssomanager) instructions in the [Banner 8 Self-Service](#banner-8-self-service) section for a relevant guide.
 
 ## Banner 8 Self-Service
 
@@ -711,7 +711,7 @@ Store this file to be used in the "Configuring SSOManager" section.
 
 OpenText AppXtender is an app that integrates with Banner Document Management. Recently, the app was renamed to AppEnhancer. I will refer to it as AppXtender since I used AppXtender 20.4 to write this guide. It looks like some of these settings may have changed in AppEnhancer, but I do not have an install to test it with. Please refer to your version's documentation if these instructions do not work.
 
-To get AppXtender working with Entra, you must first install the SSO files. Instructions to download and install the files can be found in the Ellucian documentation linked in the "Configuring AppXtender" section.
+To get AppXtender working with Entra, you must first install the SSO files. Instructions to download and install the files can be found in the Ellucian documentation linked in the [Configuring AppXtender](#configuring-appxtender) section.
 
 ### Configuring Entra for AppXtender
 
@@ -727,7 +727,7 @@ To get AppXtender working with Entra, you must first install the SSO files. Inst
 
 ### PKCS #12 Keystore File
 
-Please refer to the "Creating a PKCS #12 version of the Java Keystore" section to create a PKCS #12 version of the Java keystore. Place the file in the AppXtender install directory. This directory will also have the `bdm.sso.config` file that needs to be edited.
+Please refer to the [Creating a PKCS #12 version of the Java Keystore](#creating-a-pkcs-12-version-of-the-java-keystore) section to create a PKCS #12 version of the Java keystore. Place the file in the AppXtender install directory. This directory will also have the `bdm.sso.config` file that needs to be edited.
 
 ### Configuring AppXtender
 
