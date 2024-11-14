@@ -29,7 +29,6 @@
 	* [Configuring Entra for Banner Admin Pages](#configuring-entra-for-banner-admin-pages)
 	* [Configuring Entra for Banner Access Management](#configuring-entra-for-banner-access-management)
 	* [Configuring Tomcat's Cookie Processor Component and Session Timeout](#configuring-tomcats-cookie-processor-component-and-session-timeout)
-	
 	* [Configuring Banner Admin Pages and Banner Access Management](#configuring-banner-admin-pages-and-banner-access-management)
 		* [Java Keystore File](#java-keystore-file-1)
 		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file-1)
