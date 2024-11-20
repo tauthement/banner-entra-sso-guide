@@ -216,7 +216,7 @@ This is a two-step process. You will first need to export the public certificate
 
 ## Creating an Identity Provider XML Metadata File
 
-Some apps discussed in this guide allow you to use "Federation Metadata XML” file downloaded from Entra. For those apps that cannot use the downloaded file, you must manually create an identity provider metadata file.
+Some apps discussed in this guide allow you to use the "Federation Metadata XML” file downloaded from Entra. For those apps that cannot use the downloaded file, you must manually create an identity provider metadata file.
 
 ### Banner 9 Self-Service Apps and Application Navigator
 
@@ -273,11 +273,11 @@ Use the following settings for creating an app in Entra:
 
 #### Java Keystore File
 
-Please refer to the "Creating Keystores" section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group.
+Please refer to the [Creating Keystores](#creating-keystores) section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group.
 
 #### Service Provider XML Metadata File
 
-Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the "Creating a Service Provider XML Metadata File" instructions in this guide. 
+Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the [Creating a Service Provider XML Metadata File](#creating-a-service-provider-xml-metadata-file) instructions in this guide. 
 
 The file will need to be stored on the same server as your application and be readable by Tomcat. For example, I stored the file at `/u01/app/tomcat/saml` and made the `tomcat` user and group the owner of the directory and the files within it. I store the identity provider XML metadata and Java keystore files in there as well.
 
@@ -289,7 +289,7 @@ This file should be stored in the same location as the service provider XML meta
 
 #### Application Groovy File
 	
-Each of these apps are configured using a .groovy file. If you've ever deployed a SSB 9 app, you should be familiar with these.
+Each of these apps are configured using a .groovy file. If you've ever deployed a SSB 9 app, you should be familiar with these. A sample file based on Student Self-Service's config file can be found in the `examples` directory of this project.
 
 The following settings will be broken down by the sections within the .groovy file.
 
@@ -445,7 +445,7 @@ Use the following settings for creating an app in Entra:
 
 To ensure that Entra works with Admin Pages, you must configure Tomcat's cookie processor component. The SameSite attribute for the Admin Pages cookie will be set to "none", which allows a browser to send cookies for both cross-site and same site requests. 
 
-While this setting allows the site to work in Google Chrome and Microsoft Edge, it somewhat breaks compatibility with Mozilla Firefox. Please see the "[Whitelisting Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox)" section for a fix. Safari on macOS seems to be incompatible as well, but I have not been able to find a fix. So you may need to ask users to use Chrome, Edge, or Firefox instead.
+While this setting allows the site to work in Google Chrome and Microsoft Edge, it somewhat breaks compatibility with Mozilla Firefox. Please see the [Whitelisting Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox) section for a fix. Safari on macOS seems to be incompatible as well, but I have not been able to find a fix. So you may need to ask users to use Chrome, Edge, or Firefox instead.
 
 Configuring this component requires editing `context.xml` and `web.xml`, which can both be found in the `conf` directory of your Tomcat install. Make sure to restart Tomcat after editing these files for the change to take affect.
 
@@ -485,7 +485,7 @@ Please refer to the [Creating Keystores](#creating-keystores) section to learn h
 
 #### Service Provider XML Metadata File
 
-For Banner Admin Pages and Banner Access Management, the service provider XML metadata file creation process will be the same as the process for Banner 9 Self-Service apps and Application Navigator. Follow the "Creating a Service Provider XML Metadata File" instructions in this guide.
+For Banner Admin Pages and Banner Access Management, the service provider XML metadata file creation process will be the same as the process for Banner 9 Self-Service apps and Application Navigator. Follow the [Creating a Service Provider XML Metadata File](#creating-a-service-provider-xml-metadata-file) instructions in this guide.
 
 If you are using ESM to deploy these two apps, you will need to store this file on your build server (usually JobSub). Make sure it is readable by ESM.
 
@@ -609,15 +609,15 @@ Please refer to the [Creating Keystores](#creating-keystores) section to learn h
 
 ### Service Provider XML Metadata File
 
-Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the "Creating a Service Provider XML Metadata File" instructions in this guide. 
+Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the [Creating a Service Provider XML Metadata File](#creating-a-service-provider-xml-metadata-file) instructions in this guide. 
 
-Store this file locally to be used in the "Configuring SSOManager" section.
+Store this file locally to be used in the [Configuring SSOManager](#configuring-ssomanager) section.
 
 ### Identity Provider XML Metadata File
 
-The "Federation Metadata XML" metadata file downloaded from Entra did not work with SSOManager when I tested it. Instead, I used the sample identity provider XML metadata file found in the `examples` directory of this project. Please see the "Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service" section of "Creating an Identity Provider XML Metadata File" for more instructions.
+The "Federation Metadata XML" metadata file downloaded from Entra did not work with SSOManager when I tested it. Instead, I used the sample identity provider XML metadata file found in the `examples` directory of this project. Please see the [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions.
 
-Store this file to be used in the "Configuring SSOManager" section.
+Store this file to be used in the [Configuring SSOManager](#configuring-ssomanager) section.
 
 ### Configuring SSOManager
 
