@@ -605,7 +605,7 @@ Use the following settings for creating an app in Entra:
 
 ### Java Keystore File
 
-Please refer to the "Creating Keystores" section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a directory on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group.  
+Please refer to the [Creating Keystores](#creating-keystores) section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. The keystore for SSOManager will be packaged into the WAR file. See step 3 within the [Configuring SSOManager](#configuring-ssomanager) section. 
 
 ### Service Provider XML Metadata File
 
