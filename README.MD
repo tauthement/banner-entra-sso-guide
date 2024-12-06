@@ -24,6 +24,7 @@
 		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file)
 		* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file)
 		* [Application Groovy File](#application-groovy-file)
+	* [Whitelisting Application Navigator in Google Chrome](#whitelisting-application-navigator-in-google-chrome)
 	* [Whitelisting Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox)
 * [Banner Admin Pages and Banner Access Management](#banner-admin-pages-and-banner-access-management)
 	* [Configuring Entra for Banner Admin Pages](#configuring-entra-for-banner-admin-pages)
@@ -133,7 +134,7 @@ Tomcat must also be configured to match the session timeout. Please see the [Con
 
 ## Creating Keystores
 
-A Java keystore is needed to generate a self-signed certificate for the service provider applications (Admin Pages, Self-Service apps, Banner 8 Self-Serivce, etc.). The commands used in this documentation are for the Linux/macOS version of keytool. However, the Windows version of keytool should be very similar. Since the arguments available in keytool can vary depending on the version installed, it is recommended to look up the documentation for that version.
+A Java keystore is needed to generate a self-signed certificate for the service provider applications (Admin Pages, Self-Service apps, Banner 8 Self-Service, etc.). The commands used in this documentation are for the Linux/macOS version of keytool. However, the Windows version of keytool should be very similar. Since the arguments available in keytool can vary depending on the version installed, it is recommended to look up the documentation for that version.
 
 The Java keystore should be stored somewhere on your server that is readable by the Linux user running your Tomcat server. The command below will generate a self-signed certificate that is valid for 9999 days. Please modify the validity period to your liking. To ensure compatibility with Entra, the keystore must use SHA256 with RSA as the signing algorithm. For compatibility with Banner apps, the keystore type must be in JKS format. In my testing, the Banner apps do not support PKCS12 keystores for the SAML configuration.
 
@@ -385,9 +386,32 @@ The following settings will be broken down by the sections within the .groovy fi
 		* Ex. `requireLogoutResponseSigned: false`
 * Save the file and redeploy using your preferred deployment method.
 
+### Whitelisting Application Navigator in Google Chrome
+
+Google Chrome has begun blocking third-party cookies by default to limit cross-site tracking. A third-party cookie is any cookie that does not belong to a server using the same domain as your Application Navigator server. For instance, a cookie from server2.univ.edu would be a first-party cookie if your Application Navigator server is appnav-test.univ.edu. A cookie from login.microsoftonline.com does not use the univ.edu domain, so it would be considered a third-party cookie. 
+
+When you load a form in Application Navigator, App Nav attempts to load Admin Pages in an inline frame, which contacts login.microsoftonline.com to verify that the user is logged in to Entra. When Entra tries to store a third-party cookie from login.microsoftonline.com, Application Navigator will not finish loading the Admin Pages form due to the browser settings. This usually results in an error that states "Authentication Failed / Problem in external authentication services".
+
+To fix this, we must set Google Chrome to allow Application Navigator to load third-party cookies.
+
+* Open Chrome's settings
+* Go to `Privacy and security`
+* Click `Third-party cookies`
+* Scroll to the `Sites allowed to use third-party cookies` section
+* Click the `Add` button
+* Add the URI of the Application Navigator server
+	* Example: `appnav-test.univ.edu`
+	* NOTE: You may also whitelist your entire domain by using the following format: `[*.]univ.edu`.
+* Click `Add`
+* Reload Application Navigator and try to load a form.
+
+If your institution uses an MDM to manage computers, Google Chrome can be mass-configured to whitelist Application Navigator using the [BlockThirdPartyCookies](https://chromeenterprise.google/policies/#BlockThirdPartyCookies) and [CookiesAllowedForUrls](https://chromeenterprise.google/policies/#CookiesAllowedForUrls) settings. The `BlockThirdPartyCookies` setting must be set to `true` for `CookiesAllowedForUrls` to work. Please speak to your MDM administrator about deploying the exception list.
+
+Additional information can be found at the following site: [https://support.google.com/chrome/a/answer/14439269](Allow or restrict third-party cookies).
+
 ### Whitelisting Application Navigator in Mozilla Firefox
 
-Setting `SameSite=none` for Admin Pages' cookie breaks Mozilla Firefox's ability to load Admin Pages within Application Navigator's iframe, but there is a fix. Firefox's Enhanced Tracking Protection default setting of "Standard" doesn't allow for Admin Pages to load because of the cookie setting as well as Entra sending the `X-Frame-Options=deny` header in the response. We can get around this by whitelisting Application Navigator's URL in Firefox's Enhanced Tracking Protection settings.
+Just like Google Chrome, Mozilla has decided to start blocking third-party cookies in Firefox. Firefox's Enhanced Tracking Protection default setting of "Standard" doesn't allow for Admin Pages to load because of the cookie setting as well as Entra sending the `X-Frame-Options=deny` header in the response. We can get around this by whitelisting Application Navigator's URL in Firefox's Enhanced Tracking Protection settings.
 
 * Open Firefox's settings
 * Go to `Privacy & Security`
@@ -400,6 +424,8 @@ Setting `SameSite=none` for Admin Pages' cookie breaks Mozilla Firefox's ability
 * Reload Application Navigator and try to load a form. 
 
 If your institution uses an MDM to manage computers, Firefox can be mass-configured to whitelist Application Navigator using the [EnableTrackingProtection](https://mozilla.github.io/policy-templates/#enabletrackingprotection) setting. Please speak to your MDM administrator about deploying the exception list.
+
+
 
 ## Banner Admin Pages and Banner Access Management
 
