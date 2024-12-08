@@ -407,7 +407,7 @@ To fix this, we must set Google Chrome to allow Application Navigator to load th
 
 If your institution uses an MDM to manage computers, Google Chrome can be mass-configured to whitelist Application Navigator using the [BlockThirdPartyCookies](https://chromeenterprise.google/policies/#BlockThirdPartyCookies) and [CookiesAllowedForUrls](https://chromeenterprise.google/policies/#CookiesAllowedForUrls) settings. The `BlockThirdPartyCookies` setting must be set to `true` for `CookiesAllowedForUrls` to work. Please speak to your MDM administrator about deploying the exception list.
 
-Additional information can be found at the following site: [https://support.google.com/chrome/a/answer/14439269](Allow or restrict third-party cookies).
+Additional information can be found at the following site: [Allow or restrict third-party cookies](https://support.google.com/chrome/a/answer/14439269).
 
 ### Whitelisting Application Navigator in Mozilla Firefox
 
