@@ -415,7 +415,7 @@ Just like Google Chrome, Mozilla has decided to start blocking third-party cooki
 
 * Open Firefox's settings
 * Go to `Privacy & Security`
-* Click `Manage Exceptions...` 
+* Under the `Enhanced Privacy Protection` section, click `Manage Exceptions...` 
 * In the `Address of website` field, enter the base URL of your Application Navigator server.
     * Example: `https://appnav-test.univ.edu:8443`
     * Add all instances of Application Navigator that your institution uses (ie. TEST, PROD).
