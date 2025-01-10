@@ -8,7 +8,7 @@
 * [Introduction](#introduction)
 * [Microsoft Entra](#microsoft-entra)
 	* [Creating an Entra Application](#creating-an-entra-application)
-	* [Setting a Session Timeout Period](#setting-a-session-timeout-period)
+	* [Creating a Sign-In Frequency Conditional Access Policy](#creating-a-sign-in-frequency-conditional-access-policy)
 * [Creating Keystores](#creating-keystores)
 	* [Creating a Java Keystore for Service Provider Applications](#creating-a-java-keystore-for-service-provider-applications)
 	* [Creating a PKCS #12 version of the Java Keystore](#creating-a-pkcs-12-version-of-the-java-keystore)
@@ -29,19 +29,23 @@
 * [Banner Admin Pages and Banner Access Management](#banner-admin-pages-and-banner-access-management)
 	* [Configuring Entra for Banner Admin Pages](#configuring-entra-for-banner-admin-pages)
 	* [Configuring Entra for Banner Access Management](#configuring-entra-for-banner-access-management)
-	* [Configuring Tomcat's Cookie Processor Component and Session Timeout](#configuring-tomcats-cookie-processor-component-and-session-timeout)
+	* [Configuring Tomcat's Cookie Settings](#configuring-tomcats-cookie-settings)
 	* [Configuring Banner Admin Pages and Banner Access Management](#configuring-banner-admin-pages-and-banner-access-management)
 		* [Java Keystore File](#java-keystore-file-1)
 		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file-1)
 		* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file-1)
 		* [Deploying with ESM](#deploying-with-esm)
 		* [Manual Configuration](#manual-configuration)
+		* [Configuring the Admin Pages and Access Management Session Timeout](#configuring-the-admin-pages-and-access-management-session-timeout)
+		* [Configuring the Admin Pages and Access Management SAML Token Lifetime](#configuring-the-admin-pages-and-access-management-saml-token-lifetime)
+        * [Testing the Admin Pages' SSO Without Application Navigator](#testing-the-admin-pages-sso-without-application-navigator)
 * [Banner 8 Self-Service](#banner-8-self-service)
 	* [Configuring Entra for Banner 8 Self-Service](#configuring-entra-for-banner-8-self-service)
 	* [Java Keystore File](#java-keystore-file-2)
 	* [Service Provider XML Metadata File](#service-provider-xml-metadata-file-2)
 	* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file-2)
 	* [Configuring SSOManager](#configuring-ssomanager)
+    * [Configuring the Tomcat Session Timeout for SSB8](#configuring-the-tomcat-session-timeout-for-ssb8)
 	* [Update GUACONF](#update-guaconf)
 * [AppXtender/AppEnhancer (Banner Document Management)](#appxtenderappenhancer-banner-document-managment)
 	* [Configuring Entra for AppXtender](#configuring-entra-for-appxtender)
@@ -57,7 +61,7 @@ Some key words in this document are service provider (SP) and identity provider 
 
 This documentation will cover manually configuring the applications and briefly discuss using ESM to deploy Banner Admin Pages and Banner Access Management. You should modify these methods to suit your deployment methods, or work with the person responsible for deploying your applications. The respective applications will have documentation in the Customer Center that discuss deployment. The Ellucian SSO Handbook is also a great resource for more information on implementing SAML with your applications. 
 
-This documentation is presented without warranty. You know your environment better than I do. Modify these instructions to your own needs. 
+DISCLAIMER: This documentation is presented without warranty. I don't claim to be an expert in this subject matter, but I have been working with single sign-on for several years. I'm bound to get things wrong and will gladly admit when I am. These instructions mostly reflect my own institution's environment. You know your environment better than I do. Please modify these instructions to your own needs and let me know if you think anything should be corrected. 
 
 ## Microsoft Entra
 
@@ -83,7 +87,7 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 10. Click on the SAML box
 11. On the “Set up Single Sign-On with SAML” page, you will see five boxes labeled with numbers. The steps below will detail each one.
 	* **Box 1 - Basic SAML Configuration**
-		* Click Edit at the top right of the first box labeled “Basic SAML Configuration”. Enter a unique name in the “Identifier (Entity ID)” field. This name will be used in your service provider XML metadata file later on and should be unique to each Banner application. 
+		* Click Edit at the top right of the first box labeled “Basic SAML Configuration”. Enter a unique name in the “Identifier (Entity ID)” field. This name will be used in your service provider XML metadata file later on and should be unique to each Banner application and unique to your Entra tenant. 
 			* Ex. `banner-stuss-test-sp`
 		* Enter the ACS (Assertion Consumer Service) URL of your Banner app in the “Reply URL” field. 
 			* Below is just an example. Each Banner app section will include more specific examples. Please check the respective section instead of copying this one.
@@ -122,15 +126,15 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 	* **Box 5 - Test Single Sign-on with "Entra App Name"**
 		* Ignore this step for now. If the Banner app is not configured yet, this test will not work. You can use this after the Banner app is setup.
 
-### Setting a Session Timeout Period
+### Creating a Sign-In Frequency Conditional Access Policy
 
-You will need to create a Conditional Access policy to configure the session timeout period for Banner apps to avoid getting errors such as “Invalid username/password” or “Session Initialization Failed”. When you configure your Banner Admin and Banner Self-Services apps, you should set the variable called “maxAuthenticationAge” (in seconds) to match the timeout period you set here. For example, 1 hour = 3600 seconds. The “maxAuthenticationAge” variable should not be lower than the timeout period set in Entra or you will get errors. The current default session period for Entra is 90 days. The lowest amount of time you can set is one hour.
+A Conditional Access policy will need to be configured for the sign-in frequency in Banner apps to avoid getting errors such as “Invalid username/password” or “Session Initialization Failed”. When you configure your AppNav, Banner Admin Pages, and Banner Self-Services apps, you should set the variable called `maxAuthenticationAge` (in seconds) to match the timeout period you set here. For example, 1 hour = 3600 seconds. The `maxAuthenticationAge` variable should not be higher or lower than the timeout period set in Entra or you will get the aforementioned errors. The current default session period for Entra is 90 days. The lowest amount of time you can set is one hour. For the sake of this documentation, I will use a 12-hour sign-in frequency. By setting it to 12 hours, users should only have to login once a work day on a device and not be over burdened with multi-factor authentication. 
+
+Please note that this value will be separate from the Tomcat session timeout period and the Banner application session timeout period. The SAML token lifetime and application session timeout period are different and ideally, the SAML token lifetime should last longer than the application session timeout period. By having a longer SAML token lifetime, the application session can expire and free up memory on the server. When a user needs to access the application after the session timeout cookie expires but while the SAML token is still valid, the user will be automatically logged in using SSO.
 
 Please refer to Microsoft's documentation on how to [configure adaptive session lifetime policies](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-session-lifetime). You should only need to set up Policy 1 (Sign-in Frequency Control). Policy 2 and 3 are optional. 
 
 You will need to add new Entra applications to the conditional access policy each time an application is created. If you have multiple applications to create, I suggest creating the Entra applications first then adding multiple applications to the policy all at once to save time.
-
-Tomcat must also be configured to match the session timeout. Please see the [Configuring Tomcat's Cookie Processor Component and Session Timeout](#configuring-tomcats-cookie-processor-component-and-session-timeout) section to configure Tomcat.
 
 ## Creating Keystores
 
@@ -192,9 +196,9 @@ This is a two-step process. You will first need to export the public certificate
 ## Creating a Service Provider XML Metadata File
 
 1. Download the example service provider XML metadata file.
-2. To edit this file, you will need the entity ID from “Box 1 - Basic SAML Configuration” of the Entra application setup. You will also need the service provider public certificate that was exported in the [Exporting the Service Provider Public Certificate](exporting-the-service-provider-public-certificate) section.
+2. To edit this file, you will need the entity ID from “Box 1 - Basic SAML Configuration” of the Entra application setup. You will also need the service provider public certificate that was exported in the [Exporting the Service Provider Public Certificate](#exporting-the-service-provider-public-certificate) section.
 3. Edit the following elements in the XML file.
-	* `<md:SingleSignOnService>`
+	* `<md:EntityDescriptor>`
 		* Set the `ID` and `entityID` attribute to be the same entity ID used in the Entra application setup (box 1 of the SAML setup).
 	* `<ds:X509Certificate>`
 		* In both `<ds:X509Certificate>` elements, add the X.509 certificate which you exported from the Java keystore. 
@@ -251,7 +255,7 @@ In my testing, these apps support using the "Federation Metadata XML" file that 
 
 An sample Student Self-Service groovy file is available in the `examples` directory, but do not use the sample file for all applications. It is only for demonstration purposes. The configuration files can change between releases and each app has different configurations. However, the SAML configuration should be fairly similar in all of the apps. You must modify the groovy file delivered with the version of the app being deployed.
 
-The following Banner 9 Self-Service apps have been tested with these instructions: Communication Management, Employee SSB, Extensibility, Faculty SSB, Finance SSB, General SSB, Student Registration SSB, and Student SSB. Application Navigator is not a SSB app, but it has a very similar configuration.
+The following Banner 9 Self-Service apps have been tested with these instructions: Communication Management, Employee SSB, Extensibility, Faculty SSB, Finance SSB, General SSB, Student Registration SSB, and Student SSB. Application Navigator is not a SSB app, but it is built on the same framework as the SSB 9 apps so it uses a similar configuration.
 
 ### Configuring Entra for Banner 9 Self-Service Apps and Application Navigator
 
@@ -303,16 +307,18 @@ The following settings will be broken down by the sections within the .groovy fi
 	* Set it to `saml` to use SAML as the SSO protocol.
 	* **NOTE:** Use single quotes.
 	* `authenticationProvider = 'saml'`
-* authenticationAssertionAttribute
+* `authenticationAssertionAttribute`
 	* Set to `UDC_IDENTIFIER`
 	* `authenticationAssertionAttribute = 'UDC_IDENTIFIER'`
 
 ##### CAS Configuration
 
+This will make sure that CAS is disabled.
+
 * `active`
 	* Set to `false`
 	* Since SAML will be used, make sure CAS is disabled. Double check this setting if you were previously using CAS.
-	* `active = false`	
+	* Ex. `active = false`	
 
 ##### SAML Configuration
 
@@ -338,10 +344,11 @@ The following settings will be broken down by the sections within the .groovy fi
 	* Set to the `certificate-alias` from the previous step.
 	* Ex. `grails.plugin.springsecurity.saml.keyManager.defaultKey = 'certificate-alias'`
 * `grails.plugin.springsecurity.saml.maxAuthenticationAge`
-	* Set this value to the amount of time (in seconds) that is configured in the conditional access policy created in the “Setting a Session Timeout Period” section.
-	* This setting should not be lower than the session time configured in the conditional access policy or you will receive error messages when accessing the application.
-	* So you don't have to bust out the calculator app: 3600 seconds = 1 hour
-	* Ex. `grails.plugin.springsecurity.saml.maxAuthenticationAge = 3600`
+	* This value sets the SAML token lifetime of the application. Set this value to be equal to the [Sign-In Frequency Conditional Access Policy](#creating-a-sign-in-frequency-conditional-access-policy). 
+        * By default, Entra's [default SAML token lifetime](https://learn.microsoft.com/en-us/entra/identity-platform/configurable-token-lifetimes#token-lifetime-policies-for-access-saml-and-id-tokens) is 1 hour. This is separate from the application's SAML token lifetime.
+	    * According to [this Ellucian guide](https://elluciansupport.service-now.com/customer_center?sys_kb_id=b85a1214c34d56986f99f8da050131e0&id=kb_article_view), "the SAML token lifetime setting for Banner applications should be greater than the IdP (Identity Provider) SAML token lifetime setting." 
+	* A few examples: 3600 seconds = 1 hour, 14400 seconds = 4 hours, 43200 seconds = 12 hours
+	* Ex. `grails.plugin.springsecurity.saml.maxAuthenticationAge = 43200`
 * `grails.plugin.springsecurity.saml.metadata.sp.file`
 	* Set to the file location, on the server, of your service provider XML metadata file created earlier. 
 	* **NOTE:** You **do not** need to prepend it with `file:`.
@@ -386,11 +393,42 @@ The following settings will be broken down by the sections within the .groovy fi
 		* Ex. `requireLogoutResponseSigned: false`
 * Save the file and redeploy using your preferred deployment method.
 
+### Configuring Session Timeouts
+
+Application Navigator and Banner 9 Self-Service each have their own session timeout settings. Sessions are stored in Tomcat's memory. Once a user's session has been inactive for the set period, it is freed from memory. This may result in the user needing to reauthenticate. If the user's SAML token for the application is still valid, the application should go through the SSO flow without the user ever knowing that their session was invalidated and needed reauthentication. 
+
+For example, if you set the session timeout to be 4 hours and the SAML token is valid for 12 hours, a user could access the site again after 5 hours of inactivity and login without needing to reauthenticate. Tomcat will just create a new session. However, if the SAML token and the Tomcat session have both expired, the user will be prompted to reauthenticate with their credentials.
+
+This setting is often configured using the `web.xml` file found in Tomcat's `conf` directory, but the configuration in there can be overwritten by the application's own `web.xml` file or by the application itself. In this instance, Application Navigator and Banner 9 Self-Service override the setting on the application side through a setting in GUACONF.
+
+**NOTE:** The SAML token lifetime is configured using the `grails.plugin.springsecurity.saml.maxAuthenticationAge` setting in the application's groovy file. It is not the same setting as the Tomcat session period. You must configure both. 
+
+#### Configuring Session Timeouts for Banner 9 Self-Service Applications
+
+1. Login to Banner Admin Pages
+2. Open `GUACONF`
+3. Select the Application ID of the Banner 9 Self-Service you are configuring
+    ex. `SSS` for Student Self-Serivce
+4. Click OK
+5. On the Configurations tab, set the `defaultWebSessionTimeout` value to an integer in the amount of seconds
+    ex. `14400` (4 hours)
+6. Click Save
+
+#### Configuring the Session Timeout for Application Navigator
+
+1. Login to Banner Admin Pages
+2. Open `GUACONF`
+3. Select `AppNav` as the Application ID
+4. Click OK
+5. On the Configurations tab, set the `seamless.sessionTimeout` value to an integer in the amount of minutes
+    ex. `240` (4 hours)
+6. Click Save
+
 ### Whitelisting Application Navigator in Google Chrome
 
-Google Chrome has begun blocking third-party cookies by default to limit cross-site tracking. A third-party cookie is any cookie that does not belong to a server using the same domain as your Application Navigator server. For instance, a cookie from server2.univ.edu would be a first-party cookie if your Application Navigator server is appnav-test.univ.edu. A cookie from login.microsoftonline.com does not use the univ.edu domain, so it would be considered a third-party cookie. 
+Google Chrome has begun blocking third-party cookies by default to limit cross-site tracking. A third-party cookie is any cookie that does not belong to a server using the same domain as your Application Navigator server. For instance, a cookie from server2.univ.edu would be a first-party cookie if your Application Navigator server is appnav-test.univ.edu since it uses the same domain (univ.edu). A cookie from login.microsoftonline.com does not use the univ.edu domain, so it would be considered a third-party cookie. 
 
-When you load a form in Application Navigator, App Nav attempts to load Admin Pages in an inline frame, which contacts login.microsoftonline.com to verify that the user is logged in to Entra. When Entra tries to store a third-party cookie from login.microsoftonline.com, Application Navigator will not finish loading the Admin Pages form due to the browser settings. This usually results in an error that states "Authentication Failed / Problem in external authentication services".
+When you load a form in Application Navigator, App Nav attempts to load Admin Pages in an inline frame, which contacts login.microsoftonline.com to verify that the user is logged in to Entra. When Entra tries to store a third-party cookie from login.microsoftonline.com, Application Navigator will not finish loading the Admin Pages form due to the browser settings. This usually results in an error that states "Authentication Failed / Problem in external authentication service".
 
 To fix this, we must set Google Chrome to allow Application Navigator to load third-party cookies.
 
@@ -415,7 +453,7 @@ Just like Google Chrome, Mozilla has decided to start blocking third-party cooki
 
 * Open Firefox's settings
 * Go to `Privacy & Security`
-* Under the `Enhanced Privacy Protection` section, click `Manage Exceptions...` 
+* Under the `Enhanced Tracking Protection` section, click `Manage Exceptions...` 
 * In the `Address of website` field, enter the base URL of your Application Navigator server.
     * Example: `https://appnav-test.univ.edu:8443`
     * Add all instances of Application Navigator that your institution uses (ie. TEST, PROD).
@@ -425,15 +463,13 @@ Just like Google Chrome, Mozilla has decided to start blocking third-party cooki
 
 If your institution uses an MDM to manage computers, Firefox can be mass-configured to whitelist Application Navigator using the [EnableTrackingProtection](https://mozilla.github.io/policy-templates/#enabletrackingprotection) setting. Please speak to your MDM administrator about deploying the exception list.
 
-
-
 ## Banner Admin Pages and Banner Access Management
 
-Banner Admin Pages and Banner Access Management both follow very similar procedures with only slight variations. Unlike the Application Navigator and Self-Service apps, you will not be editing an app's .groovy file. These two apps are commonly deployed and configured through ESM. If you use ESM, I recommend checking out the Single Sign-On Handbook for more information. I will try to cover ESM and manual deployment the best I can. 
+Banner Admin Pages and Banner Access Management both follow very similar procedures with only slight variations. Unlike the Application Navigator and Self-Service apps, you will not be editing an app's .groovy file. These two apps are commonly deployed and configured through ESM. If you use ESM, I recommend checking out the Single Sign-On Handbook for more information. I previously had information regarding the manual configuration of these apps to use SAML, but I wasn't confident in the information shared so it was removed. While it should be possible to manually configure the applications, I recommend using ESM. 
 
 Please note that both apps use the WorkSpaces version of the apps (BannerAdmin.ws.war and BannerAccessMgmt.ws.war) for SSO. You will be configuring those apps and not the plain ones (BannerAdmin.war and BannerAccessMgmt.war). 
 
-Another note is that the “Federation Metadata XML” file does not seem to work with these two apps as the identity provider XML metadata file. Instead, use the sample identity provider XML metadata file included in this project.
+Another note is that the “Federation Metadata XML” file downloaded from Entra does not seem to work with these two apps as the identity provider XML metadata file. Instead, use the sample identity provider XML metadata file included in this project.
 
 If you use the “bansecr” account with Banner Access Management, you will need to have this account synced or manually created in your Microsoft Entra tenant.
 
@@ -467,11 +503,15 @@ Use the following settings for creating an app in Entra:
 * Include the following attribute:
     * `UDC_IDENTIFIER`
 
-### Configuring Tomcat's Cookie Processor Component and Session Timeout
+### Configuring Tomcat's Cookie Settings
 
-To ensure that Entra works with Admin Pages, you must configure Tomcat's cookie processor component. The SameSite attribute for the Admin Pages cookie will be set to "none", which allows a browser to send cookies for both cross-site and same site requests. 
+When Application Navigator opens a form in Admin Pages, it loads the Admin Pages site within an inline frame. This is considered a cross-site request if Admin Pages is installed on a different server than Application Navigator. Just like any other SSO site, Admin Pages must go through the SSO flow to ensure the user is authenticated. This is mostly an invisible process since you are already logged in to Entra by logging in to Application Navigator. Duing this process, the browser stores a cookie from login.microsoftonline.com, which is considered a third-party cookie since it does not originate from the Application Navigator server. 
 
-While this setting allows the site to work in Google Chrome and Microsoft Edge, it somewhat breaks compatibility with Mozilla Firefox. Please see the [Whitelisting Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox) section for a fix. Safari on macOS seems to be incompatible as well, but I have not been able to find a fix. So you may need to ask users to use Chrome, Edge, or Firefox instead.
+Recent versions of browsers have become stricter about cross-site requests and third-party cookies due to privacy concerns. By default, [browsers will assume the SameSite attribute of Lax on cookies](https://hacks.mozilla.org/2020/08/changes-to-samesite-cookie-behavior/), which restricts usage of inline frames and third-party cookies. To get around this, we must configure the Admin Pages Tomcat server to send cookies with the SameSite attribute set to None, which allows for both cross-site and same site requests. 
+
+To ensure that Admin Pages and Entra loads properly within Application Navigator, you must configure [Tomcat's Cookie Processor Component](https://tomcat.apache.org/tomcat-9.0-doc/config/cookie-processor.html). This only needs to be configured on the Tomcat server hosting Banner Admin Pages.
+
+While this setting allows the site to work in Google Chrome and Microsoft Edge, it breaks compatibility with Mozilla Firefox. However, this may change in the future. 
 
 Configuring this component requires editing `context.xml` and `web.xml`, which can both be found in the `conf` directory of your Tomcat install. Make sure to restart Tomcat after editing these files for the change to take affect.
 
@@ -487,18 +527,18 @@ Add the following line within the `<Context>` tags:
 
 #### web.xml
 
+You can leave the `<session-timeout>` variable set to its default value of 30 (minutes). Since BannerAdmin.ws and BannerAccessMgmt.ws contain their own `web.xml` file in the application's `WEB-INF` directory, Tomcat will use the settings in that `web.xml` instead.
+
 Edit the `<session-config>` element to include the `<cookie-config>` element. Since we are using `SameSite=none` for the cookie, the [Secure attribute must be set](https://hacks.mozilla.org/2020/08/changes-to-samesite-cookie-behavior/) on the cookie. Setting the Secure attribute also requires that the [server uses HTTPS](https://medium.com/@yadav-ajay/using-httponly-and-secure-cookies-on-web-servers-how-to-do-it-52ccf0eabfb4).
 
 The `<http-only>` setting ensures that the cookie can only be used by the browser and not scripts.
 
-Make sure the value in `<session-timeout>` matches the [session timeout period](#setting-a-session-timeout-period) set in Entra. The value should be in minutes.
-
 ```xml
 <session-config>
-    <session-timeout>60</session-timeout>
+    <session-timeout>30</session-timeout>
     <cookie-config>
-		<http-only>true</http-only>
-		<secure>true</secure>
+        <http-only>true</http-only>
+        <secure>true</secure>
     </cookie-config>
 </session-config>
 ```
@@ -527,7 +567,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 
 #### Deploying with ESM
 
-1. Before signing in to ESM, place the service provider metadata and identity provider metadata files somewhere on your build server. Commonly, this is on JobSub. For example, I created a `saml_configuration` directory within the `BANNER9WAR` directory.
+1. Before signing in to ESM, place the service provider metadata and identity provider metadata files somewhere on your build server. This is commonly on JobSub. For example, I created a `saml_configuration` directory within the `BANNER9WAR` directory.
     * Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`  
     * Make sure the new directory and files are owned by the same user and group that the other directories are owned by.
 
@@ -542,15 +582,18 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 5. Scroll to the `Banner Administrative Pages Configuration` or `Banner Access Management Configuration` section
 6. Fill in the SAML configuration information
     * `Login Authentication Method`
-        * Choose `SAML SSO`
+        * Choose `SAML SSO` from the dropdown menu.
     * `Identity Service Url`
-        * This field is for CAS users. You may leave this field empty since you are using SAML.
+        * This field is only for CAS users. Leave this field empty since Entra will be using SAML.
     * `SAML Configuration Files Directory (full path, Jobsub)`
         * Enter the full path to the directory where the service provider metadata, identity provider metadata, and keystore files reside. This is usually on the Jobsub server.
+        * Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
     * `SAML Service Provider Metadata File Name`
         * Enter the filename of the service provider metadata file. Only the filename is needed, not the full path.
+        * Ex. `banner-saml-sp.xml`
     * `SAML Identity Provider Metadata File Name`
         * Enter the filename of the identity provider metadata file. Only the filename is needed, not the full path.
+        * Ex. `banner-saml-idp.xml`
     * `SAML Keystore File Name (full path, App Server)`
         * Enter the full path of the keystore file on the app server. The app server is the server hosting Banner Admin Pages or Banner Access Management.
         * Ex. `/u01/app/tomcat/saml/samlkeystore.jks`
@@ -563,49 +606,54 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
     * `Application Navigator URL`
         * This field is only located under the `Banner Administrative Pages Configuration` section.
         * Enter the URL to your Application Navigator install.
+        * Ex. `https://server.univ.edu:8443/applicationNavigator`
 7. Click Save
-8. Deploy Banner Admin Pages and Banner Access Management like you normally would using ESM. ESM will bundle the needed configuration and files into the WAR file.
+8. Deploy Banner Admin Pages and Banner Access Management using ESM. ESM will bundle the needed configuration and files into the WAR file.
 
-#### Manual Configuration
+#### Configuring the Admin Pages and Access Management Session Timeout
 
-> **NOTE:** <br>
-> Since manual deployment may not be the same for every institution, I will only cover the broad view of what needs to be edited and configured. Adapt these instructions to your manual deployment methods.
+Admin Pages and Access Management must be configured to have a application session timeout that is a little bit higher than Application Navigator's session timeout. Setting it a little bit higher will account for the logout timer that Application Navigator shows after a user has been idle for the amount of time set in Application Navigator's `seamless.sessiontimeout` setting in GUACONF.
 
-1. The SAML configuration files for Banner Admin Pages and Banner Access Management can be found in the following locations:
-    * `/$CATALINA_HOME/webapps/BannerAdmin.ws/WEB-INF/classes`
-    * `/$CATALINA_HOME/webapps/BannerAccessMgmt.ws/WEB-INF/classes`
-2. Place the service provider XML file, identity provider XML file, and Java keystore within the `classes` directory. 
-3. Edit the `config.properties` file
-    * `saml.keystore`
-        * Enter the full path of the SAML keystore's location on the app server. Prepend the path with `file://`.
-            * Ex. `file:///u01/app/tomcat/saml/samlkeystore.jks`
-    * `saml.keystore.password`
-        * Enter the password for the Java keystore.
-    * `saml.logout.success.url`
-        * Keep the default location.
-		* Ex. `${webapp.location}/saml/logout`
-    * `saml.sign.key.alias`
-        * Enter the alias of the signing certificate within the Java keystore.
-    * `saml.sign.key.password`
-        * Enter the password of the signing certificate within the Java keystore.
-    * `saml.sp.metadata.filename`
-        * Enter the filename of the service provider XML file within the `classes` directory. 
-		* You only need to enter the filename, not the full path.
-		* Ex. `banner-admin-test-sp.xml`
-    * `saml.idp.metadata.filename`
-        * Enter the filename of the identity provider XML file within the `classes` directory. 
-		* You only need to enter the filename, not the full path.
-		* Ex. `banner-admin-test-idp.xml`
-4. Save the `config.properties` file.
-5. Modify `applicationContext.xml`
-    * This file is located in the “WEB-INF” directory. A preconfigured version for SAML can be found in “applicationContext_saml.xml”. 
-	* Since you will be using SAML, copy the contents of “applicationContext_saml.xml” to “applicationContext.xml”, or you can overwrite the file using the copy command.
+A good way to figure out how long you should set the Tomcat session timeout is to use the following formula. More info on the `seamless.*` settings can be found in the [Application Navigator documentation](https://resources.elluciancloud.com/bundle/banner_appnav_acn_use/page/r_configuration.html). For example, in my environment I use 260 minutes for the session timeout since I have Application Navigator set to have a 4-hour idle session timeout and a 5 minute session timeout notification. (240 minutes + 5 minutes + 15 minutes)
 
+```
+session-timeout = seamless.sessionTimeout + seamless.sessionTimeoutNotification + 15 minutes
+```
+
+##### web.xml
+
+The `web.xml` file can be found can be found in the `WEB-INF` directory of the deployed BannerAdmin.ws and BannerAccessMgmt.ws directories. I have not found a way to edit this file before deployment with ESM so what I normally do is allow the WAR file to deploy, stop Tomcat, edit the `web.xml` file, then restart Tomcat. Please note that this setting only determines the session timeout for the Tomcat session, not the SAML token lifetime. 
+
+1. Open `BannerAdmin.ws/WEB-INF/web.xml` or `BannerAccessMgmt.ws/WEB-INF/web.xml`
+2. Find the `<session-config>` element
+3. Edit the `<session-timeout>` element
+
+	```xml
+	<session-config>
+		<session-timeout>260</session-timeout>
+	</session-config>
+	```
+
+#### Configuring the Admin Pages and Access Management SAML Token Lifetime
+
+To prevent mismatched SAML token ages amongst apps, you must configure the `maxAuthenticationAge` property of Banner Admin Pages and Banner Access Management. This should be the same value used for Application Navigator's `maxAuthenticationAge` property within the SAML config.
+
+1. Open `BannerAdmin.ws/WEB-INF/applicationContext.xml` or `BannerAccessMgmt.ws/WEB-INF/applicationContext.xml`
+2. Find the bean with `id="webSSOprofileConsumer"`
+	* Replace the `webSSOprofileConsumer` line with the following:
+
+		```xml
+			<bean id="webSSOprofileConsumer" class="org.springframework.security.saml.websso.WebSSOProfileConsumerImpl" lazy-init="true">
+				<property name="maxAuthenticationAge" value="43200"/> 
+			</bean>
 		```
-		cp applicationContext_saml.xml applicationContext.xml
-		```
-6. Save the file
-7. Redeploy the application using your preferred deployment method. If you're just editing the files in the unpacked install location, reboot Tomcat and the new configuration will take effect. If you would like to modify the WAR file, see the [Configuring SSOManager](#configuring-ssomanager) instructions in the [Banner 8 Self-Service](#banner-8-self-service) section for a relevant guide.
+3. Make sure to set the value of the `maxAuthenticationAge` property to the time period set in your [Entra sign-in frequency policy](#creating-a-sign-in-frequency-conditional-access-policy). The value is in seconds (43200 seconds = 12 hours). 
+
+#### Testing the Admin Pages' SSO Without Application Navigator
+
+If you would like to test Admin Pages on its own or if you don't have Application Navigator setup for Entra yet, there is a simple way to access a form. I recommend using an incognito/private window so your browser starts with a clean slate and has no previously stored cookies. This will start the SSO flow from the beginning. Use the following URL format and edit it for your own server where Banner Admin Pages is hosted. Please note that this URL is using the `BannerAdmin` app and not the `BannerAdmin.ws` app. This URL should load `GUACONF` once you are done with the SSO flow.
+
+`https://server.univ.edu:8443/BannerAdmin/?form=GUACONF`
 
 ## Banner 8 Self-Service
 
@@ -660,7 +708,7 @@ Store this file to be used in the [Configuring SSOManager](#configuring-ssomanag
 	```
     * Overwrite the old file when prompted
     * **NOTE:** If you don't want to rename the file, just edit the filename in the securityContext.xml file.
-4. Edit the `securityContext.xml` file
+4. Edit the `securityContext.xml` file.
     * Find the bean with `id=”keyManager”`
         * Edit the following info surrounded in brackets. Remove the brackets.
 		
@@ -676,19 +724,20 @@ Store this file to be used in the [Configuring SSOManager](#configuring-ssomanag
                     <constructor-arg type="java.lang.String" value="[certificate-alias]"/>
                 </bean>
             ```
-5. Find the bean with `class=”org.springframework.security.saml.metadata.ExtendedMetadata”`
+5. In `securityContext.xml`, find the bean with `class=”org.springframework.security.saml.metadata.ExtendedMetadata”`.
 	* Edit the property with `name=”signingKey”`. 
 	* Set the value attribute to the certificate alias. Remove the brackets.
 
 		```xml
 		<property name="signingKey" value="[certificate-alias]"/>
 		```
-6. Find the bean with `id=”webSSOprofileConsumer”`
-	* Replace with the following lines and set the `maxAuthenticationAge` value (in seconds) to match your Entra session timeout period.
+6. In `securityContext.xml`, find the bean with `id=”webSSOprofileConsumer”`.
+    * This will set the SAML token lifetime.
+	* Replace with the following lines and set the `maxAuthenticationAge` value (in seconds) to match your [Entra sign-in frequency policy](#creating-a-sign-in-frequency-conditional-access-policy).
 
 		```xml
 		<bean id="webSSOprofileConsumer" class="org.springframework.security.saml.websso.WebSSOProfileConsumerImpl" lazy-init="true">
-      		<property name="maxAuthenticationAge" value="3600" />
+      		<property name="maxAuthenticationAge" value="43200" />
 		</bean>
 		```
 7. Copy the identity provider XML metadata file to the `ssomanager/WEB-INF/classes` directory.
@@ -706,16 +755,32 @@ Store this file to be used in the [Configuring SSOManager](#configuring-ssomanag
 		jar uvf ssomanager.war WEB-INF
 		```
 10. Deploy the new version of `ssomanager.war`
-11. Once SSOManager is done deploying, access the SSOManager configuration website.
+11. Once SSOManager is deployed, access the SSOManager configuration website.
 	* Go to the `SSB Configuration` tab
 	* Set the mode to `SAML 2.0`
 	* Set UDC ID Indicator to `Cookie`
 	* Set UDC ID Key to `UDC_IDENTIFIER`
 12. Click Save
 
+### Configuring the Tomcat Session Timeout for SSB8
+
+Self-Service Banner 8's session timeout is configured using Tomcat's own `web.xml` file unlike Application Navigator and Banner 9 SSB apps, which use a value set in GUACONF. 
+
+1. Edit `conf/web.xml` within the Tomcat install directory
+2. Find the `<session-config>` element
+3. Edit the `<session-timeout>` value to an integer in minutes
+
+    ```xml
+    <session-config>
+        <session-timeout>240</session-timeout>
+    </session-config>
+    ```
+
+4. Restart the Tomcat server once you are doing editing for the setting to apply.
+
 ### Update GUACONF
 
-1. Go to Banner Admin Pages
+1. Login to Banner Admin Pages
 2. Open `GUACONF`
 3. Select `GLOBAL` for the Application ID
 4. On the Configurations tab, set `banner8.SS.url` to:
@@ -725,7 +790,7 @@ Store this file to be used in the [Configuring SSOManager](#configuring-ssomanag
 	* `IDMLOGINURI`
 		* Set to the Login URL found in the Entra SAML configuration
 			* Ex. `https://login.microsoftonline.com/<tenant-id>/saml2`
-			* Set the <tenant-id> to your Entra tenant ID.
+			    * Set the `<tenant-id>` to your Entra tenant ID.
 	* `IDMLOGOUTURI`
 		* Set to the SSOManager logout URL
 			* Ex. `https://server.univ.edu:8445/ssomanager/saml/logout`
