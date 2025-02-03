@@ -52,6 +52,7 @@
 * [AppXtender/AppEnhancer (Banner Document Management)](#appxtenderappenhancer-banner-document-managment)
 	* [Configuring Entra for AppXtender](#configuring-entra-for-appxtender)
 	* [PKCS #12 Keystore File](#pkcs-12-keystore-file)
+	* [PKCS #12 Keystore File](appxtender.md#pkcs-12-keystore-file)
 	* [Configuring AppXtender](#configuring-appxtender)
 	* [Configuring SSO Integration with Banner and AppXtender](#configuring-sso-integration-with-banner-admin-pages-and-appxtender)
 
