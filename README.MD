@@ -26,8 +26,10 @@
 		* [Identity Provider XML Metadata File for Banner 9 Self-Service Apps and Application Navigator](#identity-provider-xml-metadata-file-for-banner-9-self-service-apps-and-application-navigator)
 		* [Application Groovy File](#application-groovy-file)
     * [Configuring Session Timeouts for Banner 9 Self-Service Apps and Application Navigator](#configuring-session-timeouts-for-banner-9-self-service-apps-and-application-navigator)
-	* [Whitelisting Application Navigator in Google Chrome](#whitelisting-application-navigator-in-google-chrome)
-	* [Whitelisting Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox)
+    * [Configuring Browsers to Work With Application Navigator and Entra](#configuring-browsers-to-work-with-application-navigator-and-entra)
+	    * [Whitelisting Application Navigator in Google Chrome](#whitelisting-application-navigator-in-google-chrome)
+	    * [Whitelisting Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox)
+        * [Configuring macOS Safari for Application Navigator](#configuring-macos-safari-for-application-navigator)
 * [Banner Admin Pages and Banner Access Management](#banner-admin-pages-and-banner-access-management)
     * [Task List for Admin Pages and Access Management](#task-list-for-admin-pages-and-access-management)
 	* [Configuring Entra for Banner Admin Pages](#configuring-entra-for-banner-admin-pages)
@@ -274,6 +276,7 @@ The following Banner 9 Self-Service apps have been tested with these instruction
 - [ ] [Configure the App's Session Timeout](#configuring-session-timeouts-for-banner-9-self-service-apps-and-application-navigator)
 - [ ] [Whitelist Application Navigator in Google Chrome](#whitelisting-application-navigator-in-google-chrome)
 - [ ] [Whitelist Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox)
+- [ ] [Configure macOS Safari for Application Navigator](#configuring-macos-safari-for-application-navigator)
 
 ### Configuring Entra for Banner 9 Self-Service Apps and Application Navigator
 
@@ -442,7 +445,11 @@ This setting is often configured using the `web.xml` file found in Tomcat's `con
     ex. `240` (4 hours)
 6. Click Save
 
-### Whitelisting Application Navigator in Google Chrome
+### Configuring Browsers to Work With Application Navigator and Entra
+
+Due to Application Navigator and Admin Pages needing to store a third-party cookie from Entra, some of the major browsers need to be configured to allow third-party cookies. Google Chrome, Mozilla Firefox, and macOS Safari are the only browsers I have encountered having issues at the time of this writing (Feb 5, 2025). Microsoft Edge worked without any needs for configuration changes in my testing. This is subject to change.
+
+#### Whitelisting Application Navigator in Google Chrome
 
 Google Chrome now blocks third-party cookies by default to limit cross-site tracking. A third-party cookie is any cookie that does not belong to a server using the same domain as your Application Navigator server. For instance, a cookie from server2.univ.edu would be a first-party cookie if your Application Navigator server is appnav-test.univ.edu since it uses the same domain (univ.edu). A cookie from login.microsoftonline.com does not use the univ.edu domain, so it would be considered a third-party cookie. 
 
@@ -465,7 +472,7 @@ If your institution uses an MDM to manage computers, Google Chrome can be mass-c
 
 Additional information can be found at the following site: [Allow or restrict third-party cookies](https://support.google.com/chrome/a/answer/14439269).
 
-### Whitelisting Application Navigator in Mozilla Firefox
+#### Whitelisting Application Navigator in Mozilla Firefox
 
 Just like Google Chrome, Mozilla has decided to start blocking third-party cookies in Firefox. Firefox's Enhanced Tracking Protection default setting of "Standard" doesn't allow for Admin Pages to load because of the cookie setting as well as Entra sending the `X-Frame-Options=deny` header in the response. We can get around this by whitelisting Application Navigator's URL in Firefox's Enhanced Tracking Protection settings.
 
@@ -480,6 +487,14 @@ Just like Google Chrome, Mozilla has decided to start blocking third-party cooki
 * Reload Application Navigator and try to load a form. 
 
 If your institution uses an MDM to manage computers, Firefox can be mass-configured to whitelist Application Navigator using the [EnableTrackingProtection](https://mozilla.github.io/policy-templates/#enabletrackingprotection) setting. Please speak to your MDM administrator about deploying the exception list.
+
+#### Configuring macOS Safari for Application Navigator
+
+Unfortunately, macOS's Safari does not allow you to whitelist just one site. The setting to allow Application Navigator and Admin Pages to work with Entra is all or nothing. You must disable cross-site tracking prevention completely.
+
+* Open macOS Safari's settings
+* Go to the Privacy tab
+* Uncheck `Prevent cross-site tracking`
 
 ## Banner Admin Pages and Banner Access Management
 
