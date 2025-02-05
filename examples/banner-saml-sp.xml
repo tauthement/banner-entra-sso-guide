@@ -5,7 +5,11 @@
 <md:KeyDescriptor use="signing">
 <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
 <ds:X509Data>
-<!-- Insert the encoded section of the service provider public certificate that was exported from the Java keystore within the <ds:X509Certificate> tags. -->
+<!-- Insert the Base64 encoded section of the service provider public certificate that was exported from the Java keystore within the <ds:X509Certificate> tags. 
+
+DO NOT include the BEGIN CERTIFICATE and END CERTIFICATE lines.
+
+-->
 <ds:X509Certificate>
 <!-- INSERT THE SERVICE PROVIDER CERTIFICATE HERE. ERASE THIS COMMENT. -->
 </ds:X509Certificate>
@@ -15,7 +19,11 @@
 <md:KeyDescriptor use="encryption">
 <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
 <ds:X509Data>
-<!-- Insert the encoded section of the service provider public certificate that was exported from the Java keystore within the <ds:X509Certificate> tags. -->
+<!-- Insert the Base64 encoded section of the service provider public certificate that was exported from the Java keystore within the <ds:X509Certificate> tags.  
+
+DO NOT include the BEGIN CERTIFICATE and END CERTIFICATE lines.
+
+-->
 <ds:X509Certificate>
 <!-- INSERT THE SERVICE PROVIDER CERTIFICATE HERE. ERASE THIS COMMENT. -->
 </ds:X509Certificate>

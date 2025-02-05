@@ -5,7 +5,11 @@
 <md:KeyDescriptor use="signing">
 <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
 <ds:X509Data>
-<!-- Within the <ds:X509Certificate> tags, insert the identity provider public certificate that was downloaded (PEM Certificate Download) from the "SAML Certificates" section of the Entra SAML configuration. -->
+<!-- Within the <ds:X509Certificate> tags, insert the Base64 encoded section of the identity provider public certificate that was downloaded (PEM Certificate Download) from the "SAML Certificates" section of the Entra SAML configuration. 
+
+DO NOT include the BEGIN CERTIFICATE and END CERTIFICATE lines.
+
+ -->
 <ds:X509Certificate>
 <!-- INSERT THE IDP CERTIFICATE HERE. ERASE THIS COMMENT. -->
 </ds:X509Certificate>
@@ -15,7 +19,11 @@
 <md:KeyDescriptor use="encryption">
 <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
 <ds:X509Data>
-<!-- Within the <ds:X509Certificate> tags, insert the identity provider public certificate that was downloaded (PEM Certificate Download) from the "SAML Certificates" section of the Entra SAML configuration. -->
+<!-- Within the <ds:X509Certificate> tags, insert the Base64 encoded section of the identity provider public certificate that was downloaded (PEM Certificate Download) from the "SAML Certificates" section of the Entra SAML configuration. 
+
+DO NOT include the BEGIN CERTIFICATE and END CERTIFICATE lines.
+
+-->
 <ds:X509Certificate>
 <!-- INSERT THE IDP CERTIFICATE HERE. ERASE THIS COMMENT. -->
 </ds:X509Certificate>
