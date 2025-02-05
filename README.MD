@@ -18,14 +18,14 @@
 	* [Banner 9 Self-Service Apps and Application Navigator IDP XML Metadata File](#banner-9-self-service-apps-and-application-navigator-idp-xml-metadata-file)
 	* [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service-idp-xml-metadata-file)
 * [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator)
-    * [Task List for Banner 9 SSB and Application Navigator](#task-list-for-banner-9-ssb-and-application-navigator)
+    * [Task List for Banner 9 Self-Service Apps and Application Navigator](#task-list-for-banner-9-self-service-apps-and-application-navigator)
 	* [Configuring Entra for Banner 9 Self-Service Apps and Application Navigator](#configuring-entra-for-banner-9-self-service-apps-and-application-navigator)
 	* [Configuring Banner 9 Self-Service Apps and Application Navigator](#configuring-banner-9-self-service-apps-and-application-navigator)
-		* [Java Keystore File](#java-keystore-file)
-		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file)
-		* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file)
+		* [Java Keystore File for Banner 9 Self-Service Apps and Application Navigator](#java-keystore-file-for-banner-9-self-service-apps-and-application-navigator)
+		* [Service Provider XML Metadata File for Banner 9 Self-Service Apps and Application Navigator](#service-provider-xml-metadata-file-for-banner-9-self-service-apps-and-application-navigator)
+		* [Identity Provider XML Metadata File for Banner 9 Self-Service Apps and Application Navigator](#identity-provider-xml-metadata-file-for-banner-9-self-service-apps-and-application-navigator)
 		* [Application Groovy File](#application-groovy-file)
-    * [Configuring Session Timeouts for Application Navigator and SSB 9 Apps](#configuring-session-timeouts-for-application-navigator-and-ssb-9-apps)
+    * [Configuring Session Timeouts for Banner 9 Self-Service Apps and Application Navigator](#configuring-session-timeouts-for-banner-9-self-service-apps-and-application-navigator)
 	* [Whitelisting Application Navigator in Google Chrome](#whitelisting-application-navigator-in-google-chrome)
 	* [Whitelisting Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox)
 * [Banner Admin Pages and Banner Access Management](#banner-admin-pages-and-banner-access-management)
@@ -34,22 +34,24 @@
 	* [Configuring Entra for Banner Access Management](#configuring-entra-for-banner-access-management)
 	* [Configuring Tomcat's Cookie Settings](#configuring-tomcats-cookie-settings)
 	* [Configuring Banner Admin Pages and Banner Access Management](#configuring-banner-admin-pages-and-banner-access-management)
-		* [Java Keystore File](#java-keystore-file)
-		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file)
-		* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file)
+		* [Java Keystore File for Banner Admin Pages and Banner Access Management](#java-keystore-file-for-banner-admin-pages-and-banner-access-management)
+		* [Service Provider XML Metadata File](#service-provider-xml-metadata-file-for-banner-admin-pages-and-banner-access-management)
+		* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file-for-banner-admin-pages-and-banner-access-management)
 		* [Deploying with ESM](#deploying-with-esm)
 		* [Configuring the Admin Pages and Access Management Session Timeout](#configuring-the-admin-pages-and-access-management-session-timeout)
 		* [Configuring the Admin Pages and Access Management SAML Token Lifetime](#configuring-the-admin-pages-and-access-management-saml-token-lifetime)
         * [Testing the Admin Pages' SSO Without Application Navigator](#testing-the-admin-pages-sso-without-application-navigator)
 * [Banner 8 Self-Service](#banner-8-self-service)
+    * [Task List for Banner 8 Self-Service](#task-list-for-banner-8-self-service)
 	* [Configuring Entra for Banner 8 Self-Service](#configuring-entra-for-banner-8-self-service)
-	* [Java Keystore File](#java-keystore-file)
-	* [Service Provider XML Metadata File](#service-provider-xml-metadata-file)
-	* [Identity Provider XML Metadata File](#identity-provider-xml-metadata-file)
+	* [Java Keystore File for Banner 8 Self-Service](#java-keystore-file-for-banner-8-self-service)
+	* [Service Provider XML Metadata File for Banner 8 Self-Service](#service-provider-xml-metadata-file-for-banner-8-self-service)
+	* [Identity Provider XML Metadata File for Banner 8 Self-Service](#identity-provider-xml-metadata-file-for-banner-8-self-service)
 	* [Configuring SSOManager](#configuring-ssomanager)
-    * [Configuring the Tomcat Session Timeout for SSB8](#configuring-the-tomcat-session-timeout-for-ssb8)
+    * [Configuring the Tomcat Session Timeout for SSB8](#configuring-the-tomcat-session-timeout-for-banner-8-self-service)
 	* [Update GUACONF](#update-guaconf)
 * [AppXtender/AppEnhancer (Banner Document Management)](#appxtenderappenhancer-banner-document-managment)
+    * [Task List for AppXtender](#task-list-for-appxtender)
 	* [Configuring Entra for AppXtender](#configuring-entra-for-appxtender)
 	* [PKCS #12 Keystore File](#pkcs-12-keystore-file)
 	* [Configuring AppXtender](#configuring-appxtender)
@@ -260,16 +262,16 @@ An sample Student Self-Service groovy file is available in the `examples` direct
 
 The following Banner 9 Self-Service apps have been tested with these instructions: Communication Management, Employee SSB, Extensibility, Faculty SSB, Finance SSB, General SSB, Student Registration SSB, and Student SSB. Application Navigator is not a SSB app, but it is built on the same framework as the SSB 9 apps so it uses a similar configuration.
 
-### Task List for Banner 9 SSB and Application Navigator
+### Task List for Banner 9 Self-Service Apps and Application Navigator
 
 - [ ] [Create an app in Entra](#creating-an-entra-application)
     - [ ] [Configuring Entra application for Banner 9 SSB and Application Navigator](#configuring-entra-for-banner-9-self-service-apps-and-application-navigator)
 - [ ] [Configure a Sign-in Frequency Conditional Access Policy](#creating-a-sign-in-frequency-conditional-access-policy)
-- [ ] [Locate or create a Java Keystore](#creating-a-java-keystore-for-service-provider-applications)
-- [ ] [Create a Service Provider XML File](#creating-a-service-provider-xml-metadata-file)
-- [ ] [Create an Identity Provider XML File](#banner-9-self-service-apps-and-application-navigator-idp-xml-metadata-file)
-- [ ] [Configure the application's .groovy file](#application-groovy-file)
-- [ ] [Configure the application session timeout](#configuring-session-timeouts-for-application-navigator-and-ssb-9-apps)
+- [ ] [Locate or create a Java Keystore](#java-keystore-file-for-banner-9-self-service-apps-and-application-navigator)
+- [ ] [Create a Service Provider XML File](#service-provider-xml-metadata-file-for-banner-9-self-service-apps-and-application-navigator)
+- [ ] [Create an Identity Provider XML File](#identity-provider-xml-metadata-file-for-banner-9-self-service-apps-and-application-navigator)
+- [ ] [Configure the App's Groovy File](#application-groovy-file)
+- [ ] [Configure the App's Session Timeout](#configuring-session-timeouts-for-banner-9-self-service-apps-and-application-navigator)
 - [ ] [Whitelist Application Navigator in Google Chrome](#whitelisting-application-navigator-in-google-chrome)
 - [ ] [Whitelist Application Navigator in Mozilla Firefox](#whitelisting-application-navigator-in-mozilla-firefox)
 
@@ -292,17 +294,17 @@ Use the following settings for creating an app in Entra:
 
 ### Configuring Banner 9 Self-Service Apps and Application Navigator
 
-#### Java Keystore File
+#### Java Keystore File for Banner 9 Self-Service Apps and Application Navigator
 
 Please refer to the [Creating Keystores](#creating-keystores) section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group.
 
-#### Service Provider XML Metadata File
+#### Service Provider XML Metadata File for Banner 9 Self-Service Apps and Application Navigator
 
 Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the [Creating a Service Provider XML Metadata File](#creating-a-service-provider-xml-metadata-file) instructions in this guide. 
 
 The file will need to be stored on the same server as your application and be readable by Tomcat. For example, I stored the file at `/u01/app/tomcat/saml` and made the `tomcat` user and group the owner of the directory and the files within it. I store the identity provider XML metadata and Java keystore files in there as well.
 
-#### Identity Provider XML Metadata File
+#### Identity Provider XML Metadata File for Banner 9 Self-Service Apps and Application Navigator
 
 For the Banner 9 Self-Service apps and Application Navigator, I had luck with using the "Federation Metadata XML" file downloaded from Entra. Please see the [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions. If those files don't work for you, please try manually creating the identity provider XML metadata file using the sample file in the `examples` directory of this project.
 
@@ -409,7 +411,7 @@ This will make sure that CAS is disabled. It is important to only have one singl
         * Ex. `requireLogoutResponseSigned: false`
 * Save the file and redeploy using your preferred deployment method.
 
-### Configuring Session Timeouts for Application Navigator and SSB 9 Apps
+### Configuring Session Timeouts for Banner 9 Self-Service Apps and Application Navigator
 
 Application Navigator and Banner 9 Self-Service each have their own session timeout settings. Sessions are stored in Tomcat's memory and once a user's session has been inactive for the configured period, it is freed from Tomcat's memory. This may result in the user needing to reauthenticate. If the user's SAML token for the application is still valid, the application should go through the SSO flow without the user needing to reauthenticate with their credentials. 
 
@@ -419,7 +421,7 @@ This setting is often configured using the `web.xml` file found in Tomcat's `con
 
 **NOTE:** The SAML token lifetime is configured using the `grails.plugin.springsecurity.saml.maxAuthenticationAge` setting in the application's groovy file. The SAML token lifetime is not the same setting as the Tomcat session timeout. You must configure both. 
 
-#### Configuring Session Timeouts for Banner 9 Self-Service Applications
+#### Configuring Session Timeouts for Banner 9 Self-Service Apps
 
 1. Login to Banner Admin Pages
 2. Open `GUACONF`
@@ -496,12 +498,12 @@ If you use the “bansecr” account with Banner Access Management, you will nee
     - [ ] [Configure Entra application for Banner Access Management](#configuring-entra-for-banner-access-management)
 - [ ] [Configure a Sign-in Frequency Conditional Access Policy](#creating-a-sign-in-frequency-conditional-access-policy)
 - [ ] [Configure Tomcat's Cookie Settings](#configuring-tomcats-cookie-settings)
-- [ ] [Locate or create a Java Keystore](#creating-a-java-keystore-for-service-provider-applications)
-- [ ] [Create a Service Provider XML File](#creating-a-service-provider-xml-metadata-file)
-- [ ] [Create an Identity Provider XML File](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service-idp-xml-metadata-file)
+- [ ] [Locate or create a Java Keystore](#java-keystore-file-for-banner-admin-pages-and-banner-access-management)
+- [ ] [Create a Service Provider XML File](#service-provider-xml-metadata-file-for-banner-admin-pages-and-banner-access-management)
+- [ ] [Create an Identity Provider XML File](#identity-provider-xml-metadata-file-for-banner-admin-pages-and-banner-access-management)
 - [ ] [Configure ESM and deploy application](#deploying-with-esm)
-- [ ] [Configure the application session timeout](#configuring-the-admin-pages-and-access-management-session-timeout)
-- [ ] [Configure the application SAML token lifetime](#configuring-the-admin-pages-and-access-management-saml-token-lifetime)
+- [ ] [Configure the App Session Timeout](#configuring-the-admin-pages-and-access-management-session-timeout)
+- [ ] [Configure the App SAML Token Lifetime](#configuring-the-admin-pages-and-access-management-saml-token-lifetime)
 
 ### Configuring Entra for Banner Admin Pages
 
@@ -575,11 +577,11 @@ The `<http-only>` setting ensures that the cookie can only be used by the browse
 
 ### Configuring Banner Admin Pages and Banner Access Management
 
-#### Java Keystore File
+#### Java Keystore File for Banner Admin Pages and Banner Access Management
 
 Please refer to the [Creating Keystores](#creating-keystores) section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. Place the Java keystore file in a location on the app server that is readable by Tomcat. For instance, I stored mine in `/u01/app/tomcat/saml` along with my XML metadata files. The directory is owned by the `tomcat` user and group. This file does not need to be placed on the build server.  
 
-#### Service Provider XML Metadata File
+#### Service Provider XML Metadata File for Banner Admin Pages and Banner Access Management
 
 For Banner Admin Pages and Banner Access Management, the service provider XML metadata file creation process will be the same as the process for Banner 9 Self-Service apps and Application Navigator. Follow the [Creating a Service Provider XML Metadata File](#creating-a-service-provider-xml-metadata-file) instructions in this guide.
 
@@ -587,7 +589,7 @@ If you are using ESM to deploy these two apps, you will need to store this file 
 
 Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 
-#### Identity Provider XML Metadata File
+#### Identity Provider XML Metadata File for Banner Admin Pages and Banner Access Management
 
 Banner Admin Pages and Banner Access Management cannot use the "Federation Metadata XML" file downloaded from Entra, in my testing. Instead, you must use the sample XML metadata file from the `examples` directory of this project. Please see the [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service IDP XML Metadata File](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service-idp-xml-metadata-file) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions.
 
@@ -702,6 +704,18 @@ Banner 8 Self-Service uses the SSOManager app to facilitate single sign-on. SSOM
 
 Configuring SSOManager requires that the WAR file is unpacked, edited, then repacked. Doing so requires that Java (and the jar executable) is installed on the machine that you use to modify the WAR file.
 
+### Task List for Banner 8 Self-Service
+
+- [ ] [Create an app in Entra](#creating-an-entra-application)
+    - [ ] [Configuring Entra for Banner 8 Self-Service](#configuring-entra-for-banner-8-self-service)
+- [ ] [Configure a Sign-in Frequency Conditional Access Policy](#creating-a-sign-in-frequency-conditional-access-policy)
+- [ ] [Locate or create a Java Keystore](#java-keystore-file-for-banner-8-self-service)
+- [ ] [Create a Service Provider XML File](#service-provider-xml-metadata-file-for-banner-8-self-service)
+- [ ] [Create an Identity Provider XML File](#identity-provider-xml-metadata-file-for-banner-8-self-service)
+- [ ] [Configure SSOManager](#configuring-ssomanager)
+- [ ] [Configure the Tomcat Session Lifetime](#configuring-the-tomcat-session-timeout-for-banner-8-self-service)
+- [ ] [Update GUACONF](#update-guaconf)
+
 ### Configuring Entra for Banner 8 Self-Service
 
 Use the following settings for creating an app in Entra:
@@ -718,17 +732,17 @@ Use the following settings for creating an app in Entra:
 * Include the following attribute:
     * `UDC_IDENTIFIER`
 
-### Java Keystore File
+### Java Keystore File for Banner 8 Self-Service
 
 Please refer to the [Creating Keystores](#creating-keystores) section to learn how to create a keystore. The same keystore can be used for all of the apps in this guide. The keystore for SSOManager will be packaged into the WAR file. See step 3 within the [Configuring SSOManager](#configuring-ssomanager) section. 
 
-### Service Provider XML Metadata File
+### Service Provider XML Metadata File for Banner 8 Self-Service
 
 Copy the service provider XML metadata file found in the `examples` directory of this project. Modify it according to the instructions in the [Creating a Service Provider XML Metadata File](#creating-a-service-provider-xml-metadata-file) instructions in this guide. 
 
 Store this file locally to be used in the [Configuring SSOManager](#configuring-ssomanager) section.
 
-### Identity Provider XML Metadata File
+### Identity Provider XML Metadata File for Banner 8 Self-Service
 
 The "Federation Metadata XML" metadata file downloaded from Entra did not work with SSOManager when I tested it. Instead, I used the sample identity provider XML metadata file found in the `examples` directory of this project. Please see the [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service IDP XML Metadata File](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service-idp-xml-metadata-file) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions.
 
@@ -803,7 +817,7 @@ Store this file to be used in the [Configuring SSOManager](#configuring-ssomanag
     * Set UDC ID Key to `UDC_IDENTIFIER`
 12. Click Save
 
-### Configuring the Tomcat Session Timeout for SSB8
+### Configuring the Tomcat Session Timeout for Banner 8 Self-Service
 
 Self-Service Banner 8's session timeout is configured using Tomcat's own `web.xml` file unlike Application Navigator and Banner 9 SSB apps, which use a value set in GUACONF. 
 
@@ -844,6 +858,15 @@ Self-Service Banner 8's session timeout is configured using Tomcat's own `web.xm
 OpenText AppXtender is an app that integrates with Banner Document Management. Recently, the app was renamed to AppEnhancer. I will refer to it as AppXtender since I used AppXtender 20.4 to write this guide. It looks like some of these settings may have changed in AppEnhancer, but I do not have an install to test it with. Please refer to your version's documentation if these instructions do not work.
 
 To get AppXtender working with Entra, you must first install the SSO files. Instructions to download and install the files can be found in the Ellucian documentation linked in the [Configuring AppXtender](#configuring-appxtender) section.
+
+### Task List for AppXtender
+
+- [ ] [Create an app in Entra](#creating-an-entra-application)
+    - [ ] [Configuring Entra for AppXtender](#configuring-entra-for-appxtender)
+- [ ] [Configure a Sign-in Frequency Conditional Access Policy](#creating-a-sign-in-frequency-conditional-access-policy)
+- [ ] [Locate or create a PKCS #12 Keystore](#pkcs-12-keystore-file)
+- [ ] [Configure AppXtender](#configuring-appxtender)
+- [ ] [Configure SSO Integration with Banner Admin Pages and AppXtender](#configuring-sso-integration-with-banner-admin-pages-and-appxtender)
 
 ### Configuring Entra for AppXtender
 
