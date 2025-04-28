@@ -708,7 +708,7 @@ If you would like to test Admin Pages on its own or if you don't have Applicatio
 2. Login to Admin Pages using the /saml/login/initialize page.
     
     Ex. `https://server.univ.edu:8443/BannerAdmin.ws/saml/login/initialize`
-3. After logging in, visit your Admin Pages using the following URL format. Edit the URL to point to your server.
+3. After logging in, visit Admin Pages using the following URL format. Edit the URL to point to your server.
 
     Ex. `https://server.univ.edu:8443/BannerAdmin/?form=GUACONF`
 4. If successful, you should see the GUACONF form load.
