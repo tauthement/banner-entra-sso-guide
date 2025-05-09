@@ -453,7 +453,7 @@ Due to Application Navigator and Admin Pages needing to store a third-party cook
 
 Google Chrome now blocks third-party cookies by default to limit cross-site tracking. A third-party cookie is any cookie that does not belong to a server using the same domain as your Application Navigator server. For instance, a cookie from server2.univ.edu would be a first-party cookie if your Application Navigator server is appnav-test.univ.edu since it uses the same domain (univ.edu). A cookie from login.microsoftonline.com does not use the univ.edu domain, so it would be considered a third-party cookie. 
 
-When you load a form in Application Navigator, App Nav attempts to load Admin Pages in an inline frame, which contacts login.microsoftonline.com to verify that the user is logged in to Entra. When Entra tries to store a third-party cookie from login.microsoftonline.com, Application Navigator will not finish loading the Admin Pages form due to the Chrome blocking third-party cookies. This usually results in an error that states "Authentication Failed / Problem in external authentication service".
+When you load a form in Application Navigator, App Nav attempts to load Admin Pages in an inline frame, which contacts login.microsoftonline.com to verify that the user is logged in to Entra. When Entra tries to store a third-party cookie from login.microsoftonline.com, Application Navigator will not finish loading the Admin Pages form due to the Chrome blocking third-party cookies. This usually results in an error that states "Authentication Failed / Problem in external authentication service" or "Service Invocation Failed".
 
 To fix this, we must set Google Chrome to allow Application Navigator to load third-party cookies.
 
