@@ -1030,18 +1030,17 @@ Using the server's SSL certificate is also an option. However, do note that you 
 9. Choose a location to store the exported certificate.
 10. Click `Next`.
 
-#### Upload the SSO Certificate to Entra
+#### Upload the SAML Verification Certificate
 
-If you are not an Entra ID admin, send the public certificate to your admin to upload to the Entra app's SAML Verificate Certificates section.
+**NOTE:** You may only need to upload the certificate to the AppEnhancer Web Access Entra app. By accident, I discovered that AppEnhancer Admin 24.4 still worked without the public key uploaded to Entra and only the certificate thumbprint added to web.config. It's possible that this is a bug and you may need to upload the public key to Entra in future versions.
 
-**NOTE:** You may only need to upload the certificate to the AppEnhancer Web Access Entra app. By a happy accident, I discovered that AppEnhancer Admin still worked without the public key uploaded to Entra and only the certificate thumbprint added to web.config.
-
-1. Open the Entra app.
-2. Click on Single Sign-on.
-3. Go to the `SAML certificates` section.
-4. Click on Edit next to Verification Certificates.
-5. Enable `Require verification certificates` and `Allow requests signed with RSA-SHA1`.
-6. Click `Upload Certificate` and locate the exported public certificate to upload.
+1. Open the Entra app
+2. Click on `Single Sign-on`
+3. Go to the `SAML certificates` section
+4. Click on Edit next to Verification Certificates
+5. Enable `Require verification certificates` and `Allow requests signed with RSA-SHA1`
+6. Click `Upload Certificate` and locate the exported public key.
+7. Click `OK`.
 
 ### Configuring Entra for AppEnhancer Web Access
 
@@ -1059,18 +1058,6 @@ If you are not an Entra ID admin, send the public certificate to your admin to u
 * Include the following attribute:
     * `UDC_IDENTIFIER`
     * `username`
-
-#### Upload the SAML Verification Certificate
-
-**NOTE:** You may only need to upload the certificate to the AppEnhancer Web Access Entra app. By accident, I discovered that AppEnhancer Admin 24.4 still worked without the public key uploaded to Entra and only the certificate thumbprint added to web.config. It's possible that this is a bug and you may need to upload the public key to Entra in future versions.
-
-1. Open the Entra app
-2. Click on `Single Sign-on`
-3. Go to the `SAML certificates` section
-4. Click on Edit next to Verification Certificates
-5. Enable `Require verification certificates` and `Allow requests signed with RSA-SHA1`
-6. Click `Upload Certificate` and locate the exported public key.
-7. Click `OK`.
 
 ### Configuring Entra for AppEnhancer Admin
 
