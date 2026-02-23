@@ -1013,7 +1013,7 @@ Using the server's SSL certificate is also an option. However, do note that you 
 
 #### Create a Self-Signed Certificate for AppEnhancer SSO Request Signing
 
-I have included a Powershell script in the [scripts](scripts/) directory of this repository called [iis_self_signed_cert.ps1](scripts/iis_self_signed_cert.ps1). The purpose of this script is to create a self-signed certificate that lasts for 10 years. The prevents having to worry about updating the certificate every year when the server SSL certificate expires. The script first creates a self-signed certificate in the Personal certificate store and also makes a copy of the certificate to the Trusted Root Certification Authorities certificate store so it can be trusted. Otherwise, AppEnhancer will give an error about trusting the private key.
+I have included a Powershell script in the [scripts](scripts/) directory of this repository called [iis_self_signed_cert.ps1](scripts/iis_self_signed_cert.ps1). The purpose of this script is to create a self-signed certificate that lasts for 10 years. This prevents having to worry about updating the certificate every year when the server SSL certificate expires. The script first creates a self-signed certificate in the Personal certificate store and also makes a copy of the certificate to the Trusted Root Certification Authorities certificate store so it can be trusted. Otherwise, AppEnhancer will give an error about trusting the private key.
 
 1. Open PowerShell.
 2. Run the `iis_self_signed_cert.ps1` script found in the [scripts](scripts/) directory of this repository.
