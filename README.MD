@@ -1123,7 +1123,7 @@ AppEnhancer Web Access' SAML configuration is done in the `web.config` file. It 
             * This is the self-signed certificate thumbprint that was generated from the PowerShell script. If you ran the PowerShell script during this install, you may still have it on hand. Otherwise use the next step to get the thumbprint.
             * If needed, get the `AppEnhancer SSO Certificate` thumbprint by opening the Certificates app in Windows. 
                 * Navigate to `Personal` > `Certificate`.
-                * Double click on the cert with the Friendly Name of `AppEnhancer SSO Certificate` .
+                * Double click on the cert with the Friendly Name of `AppEnhancer SSO Certificate`.
                 * Go to the `Details` tab.
                 * Scroll down to the `Thumbprint` field.
                 * Copy the thumbprint value.
@@ -1137,6 +1137,20 @@ AppEnhancer Web Access' SAML configuration is done in the `web.config` file. It 
 5. Test the SSO login by going to the app URL and clicking the SAML2 link or using the [SSO direct link](#direct-linking-to-appenhancer).
 
 ### Configuring AppEnhancer Admin
+
+#### Add User to AppEnhancer Admin
+
+Before a user can login to AppEnhancer Admin, they must be added as a user to the application.
+
+1. Login to AppEnhancer Admin as `sysop` or another administrative user that has access to the `Roles Management` page.
+2. Expand the `Roles Management` then click on the data source you would like to modify.
+3. Click on the `Role Type` you want to assign to the user.
+4. Click on the `Add` button.
+5. Search for the user then click on the row with the user's info.
+6. Click `OK`.
+7. Click `Save`.
+
+#### Edit AppEnhancer Admin's Configuration File
 
 AppEnhancer Admin's SAML configuration is done in the `web.config` file. It can be found in the application directory. For example, you may find this file at `C:\inetpub\wwwroot\AppEnhancerAdmin\web.config`. Open this file in a text editor. IIS must be restarted for any changed to take effect.
 
@@ -1166,12 +1180,12 @@ AppEnhancer Admin's SAML configuration is done in the `web.config` file. It can 
             * `None`
         * clientCertificateThumbprint
             * This is the self-signed certificate thumbprint that was generated from the PowerShell script. If you ran the PowerShell script during this install, you may still have it on hand. Otherwise use the next step to get the thumbprint.
-            * If needed, get the “AppEnhancer SSO Certificate” thumbprint by opening the Certificates app in Windows. 
-                * Navigate to Personal > Certificate 
-                * Double click on the cert with the Friendly Name of “AppEnhancer SSO Certificate”.
-                * Go to the Details tab
-                * Scroll down to the Thumbprint field
-                * Copy the thumbprint value
+            * If needed, get the `AppEnhancer SSO Certificate` thumbprint by opening the Certificates app in Windows. 
+                * Navigate to `Personal` > `Certificate`
+                * Double click on the cert with the Friendly Name of `AppEnhancer SSO Certificate`.
+                * Go to the `Details` tab.
+                * Scroll down to the `Thumbprint` field.
+                * Copy the thumbprint value.
             * **NOTE:** This is a self-signed cert that is valid for 10 years. So you won’t need to update it for a while. If you're using the server's SSL certificate, it will need to be updated when it expires, which is usually every year.
         * isCasServer
             * `false`
