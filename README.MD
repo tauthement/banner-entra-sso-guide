@@ -16,7 +16,7 @@
 * [Creating a Service Provider XML Metadata File](#creating-a-service-provider-xml-metadata-file)
 * [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file)
 	* [Banner 9 Self-Service Apps and Application Navigator IDP XML Metadata File](#banner-9-self-service-apps-and-application-navigator-idp-xml-metadata-file)
-	* [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service-idp-xml-metadata-file)
+	* [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service](#banner-admin-pages-banner-access-management-and-banner-8-self-service-idp-xml-metadata-file)
 * [Banner 9 Self-Service Apps and Application Navigator](#banner-9-self-service-apps-and-application-navigator)
     * [Task List for Banner 9 Self-Service Apps and Application Navigator](#task-list-for-banner-9-self-service-apps-and-application-navigator)
 	* [Configuring Entra for Banner 9 Self-Service Apps and Application Navigator](#configuring-entra-for-banner-9-self-service-apps-and-application-navigator)
@@ -52,12 +52,22 @@
 	* [Configuring SSOManager](#configuring-ssomanager)
     * [Configuring the Tomcat Session Timeout for SSB8](#configuring-the-tomcat-session-timeout-for-banner-8-self-service)
 	* [Update GUACONF](#update-guaconf)
-* [AppXtender/AppEnhancer (Banner Document Management)](#appxtenderappenhancer-banner-document-managment)
+* [AppXtender (Banner Document Management)](#appxtender-banner-document-managment)
     * [Task List for AppXtender](#task-list-for-appxtender)
 	* [Configuring Entra for AppXtender](#configuring-entra-for-appxtender)
 	* [PKCS #12 Keystore File](#pkcs-12-keystore-file)
 	* [Configuring AppXtender](#configuring-appxtender)
-	* [Configuring SSO Integration with Banner and AppXtender](#configuring-sso-integration-with-banner-admin-pages-and-appxtender)
+	* [Configuring SSO Integration with Banner Admin Pages and AppXtender](#configuring-sso-integration-with-banner-admin-pages-and-appxtender)
+* [AppEnahncer (Banner Document Management)](#appenhancer-banner-document-management)
+    * [Task List for AppEnhancer](#task-list-for-appenhancer)
+    * [Configuring Entra for AppEnhancer Web Access](#configuring-entra-for-appenhancer-web-access)
+    * [Configuring Entra for AppEnhancer Admin](#configuring-entra-for-appenhancer-admin)
+    * [Creating the AppEnhancer SSO Certificate](#creating-the-appenhancer-sso-certificate)
+    * [Configuring AppEnhancer Web Access](#configuring-appenhancer-web-access)
+    * [Configuring AppEnhancer Admin](#configuring-appenhancer-admin)
+    * [Migrate Existing BDM SSO Users to AppEnhancer SSO](#migrate-existing-bdm-sso-users-to-appenhancer-sso)
+    * [Configuring SSO Integration with Banner Admin Pages and AppEnhancer](#configure-sso-integration-with-banner-admin-pages-and-appenhancer)
+    * [Direct Linking to AppEnhancer](#direct-linking-to-appenhancer)
 
 ## Introduction
 
@@ -67,7 +77,7 @@ Some key words in this document are service provider (SP) and identity provider 
 
 This documentation will cover manually configuring the applications and briefly discuss using ESM to deploy Banner Admin Pages and Banner Access Management. You should modify these methods to suit your deployment methods, or work with the person responsible for deploying your applications. The respective applications will have documentation in the Customer Center that discuss deployment. The Ellucian SSO Handbook is also a great resource for more information on implementing SAML with your applications. 
 
-DISCLAIMER: This documentation is presented without warranty. I don't claim to be an expert in this subject matter, but I have been working with single sign-on for several years. I'm bound to get things wrong and will gladly admit when I am. These instructions mostly reflect my own institution's environment. You know your environment better than I do. Please modify these instructions to your own needs and let me know if you think anything should be corrected. 
+**DISCLAIMER:** This documentation is presented without warranty. I don't claim to be an expert in this subject matter, but I have been working with single sign-on for several years. I'm bound to get things wrong and will gladly admit when I am. These instructions mostly reflect my own institution's environment. You know your environment better than I do. Please modify these instructions to your own needs and let me know if you think anything should be corrected. 
 
 ## Microsoft Entra
 
@@ -76,20 +86,20 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 ### Creating an Entra Application
 
 1. Login to the Microsoft Entra Admin Center
-2. Go to Application > Enterprise Applications in the menu
+2. Go to `Application` > `Enterprise Applications` in the menu
 3. Click on `New Application`
 4. On the Browse Microsoft Entra Gallery page, click on `Create your own application`
 5. In the popup, enter a name for your application.
 6. In the `What are you looking to do with your application?` section, choose `Integrate any other application you don't find in the gallery (Non-gallery)`. This will allow you to create an application capable of using SAML.
-7. Click Create
-8. Add users and groups allowed to authentication
+7. Click Create.
+8. Add users and groups allowed to authentication:
 	1. Within the Enterprise Application menu, click on `Users and groups`.
-	2. Click `Add user/group`
+	2. Click `Add user/group`.
 	3. On the `Add Assignment` page, click on `None selected` under `Users and groups`.
 	4. Add any user and/or groups that are allowed to login to the Entra application. If users are not specified individually or in a specified group, the user will receive a message about the application being blocked after logging in. 
 		* Please note that Entra does not recursively look at nested group membership. Suppose Group 1 is added to the “Users and groups” page and a user is in Group 2. If Group 2 is a nested member of Group 1, Entra will not traverse nested group memberships. Group 2 will need to be added to the `Users and groups` page as well.
-	5. Click Assign
-9. In the enterprise application menu, click on “Single sign-on”.
+	5. Click `Assign`.
+9. In the enterprise application menu, click on `Single sign-on`.
 10. Click on the SAML box
 11. On the “Set up Single Sign-On with SAML” page, you will see five boxes labeled with numbers. The steps below will detail each one.
 	* **Box 1 - Basic SAML Configuration**
@@ -111,10 +121,10 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 		* Enter `UDC_IDENTIFIER` in the Name field. It must be in all caps. 
 			* This is the default attribute shipped by Ellucian for all apps. The name can be changed in the respective SSB app's groovy file under the “authenticationAssertionAttribute” setting. You will need this value synced to your Entra tenant. If you're unsure if the value is synced, contact your Entra administrators. This value will be used to identify the user in the Banner DB. 
 		* Leave `Namespace` empty.
-		* Select `Attribute` for “Source”
+		* Select `Attribute` for “Source”.
 		* For `Source Attribute`, select the attribute which your UDCID is being synced to.
 		* Leave the `Claim Conditions` and `Advanced SAML claims options` sections alone.
-		* Click Save
+		* Click Save.
 	* **Box 3 - SAML Certificates**
 		* Click the `Download` link next to `Federation Metadata XML`.
 			* Save and rename this file to be relevant to the app you will be deploying. This will be the identity provider XML metadata file for some of the apps. Each app will have its own identity provider XML metadata file. 
@@ -154,8 +164,8 @@ It is also recommended to create a keystore for each environment (DEV, TEST, PRO
 
 This file will only be used for the applications. You do not need to import this certificate into Entra.
 
-1. Open a command line/terminal
-2. Navigate to a directory to store the Java keystore
+1. Open a command line/terminal.
+2. Navigate to a directory to store the Java keystore.
 3. Run the following command:
 	
 	```
@@ -203,7 +213,7 @@ This is a two-step process. You will first need to export the public certificate
 
 1. Download the [sample service provider XML metadata file](/examples/banner-saml-sp.xml) from this project's [examples](/examples/) directory.
 2. To edit this file, you will need the entity ID from “Box 1 - Basic SAML Configuration” of the Entra application setup. You will also need the service provider public certificate that was exported in the [Exporting the Service Provider Public Certificate](#exporting-the-service-provider-public-certificate) section.
-3. Edit the following elements in the XML file.
+3. Edit the following elements in the XML file:
     * `<md:EntityDescriptor>`
         * Set the `ID` and `entityID` attribute to be the same entity ID used in the Entra application setup (box 1 of the SAML setup).
     * `<ds:X509Certificate>`
@@ -219,7 +229,7 @@ This is a two-step process. You will first need to export the public certificate
         * Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
         * The URL is case-sensitive.
         * Modify the URL and port to point to your server.
-4. Save the file 
+4. Save the file.
 5. Banner 9 Self-Service and Application Navigator only:
     * Store the XML file in a directory on your server that is readable by your Tomcat server. 
     * Ex. `/u01/app/tomcat/saml`
@@ -233,14 +243,14 @@ Some apps discussed in this guide allow you to use the "Federation Metadata XML�
 
 In my testing, these apps support using the "Federation Metadata XML" file that can be downloaded from the MS Entra SAML configuration page. 
 
-1. Go to the Entra SAML configuration page
+1. Go to the Entra SAML configuration page.
 2. In the “SAML Certificates” section, click Download next to "Federation Metadata XML”.
 3. Rename the downloaded file to a name of your choosing. Preferably one without spaces so you don't have to escape any of the spaces later.
     * Ex. `banner-stuss-test-idp.xml`
 4. Store the file to a location on your server that is readable by your Tomcat server. This file location will be used in the SSB App Groovy File section.
     * Ex. `/u01/app/tomcat/saml`
 
-### Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service IDP XML Metadata File
+### Banner Admin Pages, Banner Access Management, and Banner 8 Self-Service IDP XML Metadata File
 
 1. Download the [sample identity provider XML metadata file](/examples/banner-saml-idp.xml) from this project's [examples](/examples/) directory.
 2. To edit this file, you will need the identity provider PEM certificate that was downloaded during the “Box 3 - SAML Configuration” section of the Entra application setup. You will also need the URLs from “Box 4 - Set up *Entra App Name*”.
@@ -288,6 +298,10 @@ Use the following settings for creating an app in Entra:
 * Reply URL (ACS URL) = `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
     * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
     * Modify the URL and port to point to your server.
+* Sign on URL =
+    * Leave empty.
+* Relay State = 
+    * Leave empty.
 * Logout URL = `https://server.univ.edu:8443/StudentSelfService/saml/SingleLogout/alias/banner-stuss-test-sp`
     * Make sure to edit the entity ID at the end of the URL.
     * This URL is case-sensitive.
@@ -329,7 +343,7 @@ The following settings will be broken down by the sections within the .groovy fi
     * **NOTE:** Use single quotes.
     * `authenticationProvider = 'saml'`
 * `authenticationAssertionAttribute`
-    * Set to `UDC_IDENTIFIER`
+    * Set to `UDC_IDENTIFIER`.
     * `authenticationAssertionAttribute = 'UDC_IDENTIFIER'`
 
 ##### CAS Configuration
@@ -337,7 +351,7 @@ The following settings will be broken down by the sections within the .groovy fi
 This will make sure that CAS is disabled. It is important to only have one single sign-on method enabled at a time.
 
 * `active`
-    * Set to `false`
+    * Set to `false`.
     * Since SAML will be used, make sure CAS is disabled. Double check this setting if you were previously using CAS.
     * Ex. `active = false`	
 
@@ -426,24 +440,27 @@ This setting is often configured using the `web.xml` file found in Tomcat's `con
 
 #### Configuring Session Timeouts for Banner 9 Self-Service Apps
 
-1. Login to Banner Admin Pages
-2. Open `GUACONF`
-3. Select the Application ID of the Banner 9 Self-Service you are configuring
+1. Login to Banner Admin Pages.
+2. Open `GUACONF`.
+3. Select the Application ID of the Banner 9 Self-Service you are configuring.
+    
     ex. `SSS` for Student Self-Serivce
-4. Click OK
-5. On the Configurations tab, set the `defaultWebSessionTimeout` value to an integer in the amount of seconds
+4. Click `OK`.
+5. On the Configurations tab, set the `defaultWebSessionTimeout` value to an integer in the amount of seconds.
+    
     ex. `14400` (4 hours)
-6. Click Save
+6. Click `Save`.
 
 #### Configuring the Session Timeout for Application Navigator
 
 1. Login to Banner Admin Pages
 2. Open `GUACONF`
 3. Select `AppNav` as the Application ID
-4. Click OK
-5. On the Configurations tab, set the `seamless.sessionTimeout` value to an integer in the amount of minutes
+4. Click OK.
+5. On the Configurations tab, set the `seamless.sessionTimeout` value to an integer in the amount of minutes.
+    
     ex. `240` (4 hours)
-6. Click Save
+6. Click `Save`.
 
 ### Configuring Browsers to Work With Application Navigator and Entra
 
@@ -457,15 +474,15 @@ When you load a form in Application Navigator, App Nav attempts to load Admin Pa
 
 To fix this, we must set Google Chrome to allow Application Navigator to load third-party cookies.
 
-* Open Chrome's settings
-* Go to `Privacy and security`
-* Click `Third-party cookies`
-* Scroll to the `Sites allowed to use third-party cookies` section
-* Click the `Add` button
-* Add the URI of the Application Navigator server
+* Open Chrome's settings.
+* Go to `Privacy and security`.
+* Click `Third-party cookies`.
+* Scroll to the `Sites allowed to use third-party cookies` section.
+* Click the `Add` button.
+* Add the URI of the Application Navigator server:
     * Example: `appnav-test.univ.edu`
     * NOTE: You may also whitelist your entire domain by using the following format: `[*.]univ.edu`.
-* Click `Add`
+* Click `Add`.
 * Reload Application Navigator and try to load a form.
 
 If your institution uses an MDM to manage computers, Google Chrome can be mass-configured to whitelist Application Navigator using the [BlockThirdPartyCookies](https://chromeenterprise.google/policies/#BlockThirdPartyCookies) and [CookiesAllowedForUrls](https://chromeenterprise.google/policies/#CookiesAllowedForUrls) settings. The `BlockThirdPartyCookies` setting must be set to `true` for `CookiesAllowedForUrls` to work. Please speak to your MDM administrator about deploying the exception list.
@@ -476,14 +493,14 @@ Additional information can be found at the following site: [Allow or restrict th
 
 Just like Google Chrome, Mozilla has decided to start blocking third-party cookies in Firefox. Firefox's Enhanced Tracking Protection default setting of "Standard" doesn't allow for Admin Pages to load because of the cookie setting as well as Entra sending the `X-Frame-Options=deny` header in the response. We can get around this by whitelisting Application Navigator's URL in Firefox's Enhanced Tracking Protection settings.
 
-* Open Firefox's settings
-* Go to `Privacy & Security`
-* Under the `Enhanced Tracking Protection` section, click `Manage Exceptions...` 
+* Open Firefox's settings.
+* Go to `Privacy & Security`.
+* Under the `Enhanced Tracking Protection` section, click `Manage Exceptions...`.
 * In the `Address of website` field, enter the base URL of your Application Navigator server.
     * Example: `https://appnav-test.univ.edu:8443`
     * Add all instances of Application Navigator that your institution uses (ie. TEST, PROD).
-* Click `Add Exception`
-* Click `Save Changes`
+* Click `Add Exception`.
+* Click `Save Changes`.
 * Reload Application Navigator and try to load a form. 
 
 If your institution uses an MDM to manage computers, Firefox can be mass-configured to whitelist Application Navigator using the [EnableTrackingProtection](https://mozilla.github.io/policy-templates/#enabletrackingprotection) setting. Please speak to your MDM administrator about deploying the exception list.
@@ -492,8 +509,8 @@ If your institution uses an MDM to manage computers, Firefox can be mass-configu
 
 Unfortunately, macOS's Safari does not allow you to whitelist just one site. The setting to allow Application Navigator and Admin Pages to work with Entra is all or nothing. You must disable cross-site tracking prevention completely.
 
-* Open macOS Safari's settings
-* Go to the Privacy tab
+* Open macOS Safari's settings.
+* Go to the `Privacy` tab.
 * Uncheck `Prevent cross-site tracking`
 
 ## Banner Admin Pages and Banner Access Management
@@ -529,6 +546,10 @@ Use the following settings for creating an app in Entra:
 * Reply URL (ACS URL) = `https://server.univ.edu:8443/BannerAdmin.ws/saml/SSO`
     * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
     * Modify the URL and port to point to your server.
+* Sign on URL =
+    * Leave empty.
+* Relay State = 
+    * Leave empty.
 * Logout URL = `https://server.univ.edu:8443/BannerAdmin.ws/saml/SingleLogout`
     * This URL is case-sensitive.
     * Modify the URL and port to point to your server.
@@ -576,7 +597,7 @@ Add the following line within the `<Context>` tags:
 
 You can leave the `<session-timeout>` variable set to its default value of 30 (minutes). Since BannerAdmin.ws and BannerAccessMgmt.ws contain their own `web.xml` file in the application's `WEB-INF` directory, Tomcat will use the settings in that `web.xml` instead.
 
-Edit the `<session-config>` element to include the `<cookie-config>` element. Since we are using `SameSite=none` for the cookie, the [Secure attribute must be set](https://hacks.mozilla.org/2020/08/changes-to-samesite-cookie-behavior/) on the cookie. Setting the Secure attribute also requires that the [server uses HTTPS](https://medium.com/@yadav-ajay/using-httponly-and-secure-cookies-on-web-servers-how-to-do-it-52ccf0eabfb4).
+Edit the `<session-config>` element to include the `<cookie-config>` element. Since we are using `SameSite=none` for the cookie, the [Secure attribute must be set](https://hacks.mozilla.org/2020/08/changes-to-samesite-cookie-behavior/) on the cookie. Setting the Secure attribute also requires that the [server uses HTTPS](https://yadav-ajay.medium.com/using-httponly-and-secure-cookies-on-web-servers-how-to-do-it-52ccf0eabfb4).
 
 The `<http-only>` setting ensures that the cookie can only be used by the browser and not scripts.
 
@@ -606,7 +627,7 @@ Ex. `/u02/esmshare/BANNER9WAR/saml_configuration`
 
 #### Identity Provider XML Metadata File for Banner Admin Pages and Banner Access Management
 
-Banner Admin Pages and Banner Access Management cannot use the "Federation Metadata XML" file downloaded from Entra, in my testing. Instead, you must use the sample XML metadata file from the `examples` directory of this project. Please see the [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service IDP XML Metadata File](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service-idp-xml-metadata-file) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions.
+Banner Admin Pages and Banner Access Management cannot use the "Federation Metadata XML" file downloaded from Entra, in my testing. Instead, you must use the sample XML metadata file from the `examples` directory of this project. Please see the [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service IDP XML Metadata File](#banner-admin-pages-banner-access-management-and-banner-8-self-service-idp-xml-metadata-file) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions.
 
 This file should be stored in the same location as the service provider XML metadata file if you are using ESM. Make sure it is readable by ESM. 
 
@@ -626,9 +647,9 @@ Please note that anytime you make changes to the SAML settings in ESM, you will 
     * Failure to do this can lead to failed builds.
 2. The keystore file will need to be stored somewhere on your app server that is readable by Tomcat.  
     * Ex. `/u01/app/tomcat/saml`
-3. Login to ESM and select your environment
-4. Go to `Env Settings`
-5. Scroll to the `Banner Administrative Pages Configuration` or `Banner Access Management Configuration` section
+3. Login to ESM and select your environment.
+4. Go to `Env Settings`.
+5. Scroll to the `Banner Administrative Pages Configuration` or `Banner Access Management Configuration` section.
 6. Fill in the SAML configuration information
     * `Login Authentication Method`
         * Choose `SAML SSO` from the dropdown menu.
@@ -656,7 +677,7 @@ Please note that anytime you make changes to the SAML settings in ESM, you will 
         * This field is only located under the `Banner Administrative Pages Configuration` section.
         * Enter the URL to your Application Navigator install.
         * Ex. `https://server.univ.edu:8443/applicationNavigator`
-7. Click Save
+7. Click `Save`.
 8. Deploy Banner Admin Pages and Banner Access Management using ESM. ESM will bundle the needed configuration and files into the WAR file.
 
 #### Configuring the Admin Pages and Access Management Session Timeout
@@ -673,16 +694,16 @@ session-timeout = seamless.sessionTimeout + seamless.sessionTimeoutNotification 
 
 The `web.xml` file can be found can be found in the `WEB-INF` directory of the deployed BannerAdmin.ws and BannerAccessMgmt.ws directories. I have not found a way to edit this file before deployment with ESM so what I normally do is allow the WAR file to deploy, stop Tomcat, edit the `web.xml` file, then restart Tomcat. Please note that this setting only determines the session timeout for the Tomcat session, not the SAML token lifetime. 
 
-1. Open `BannerAdmin.ws/WEB-INF/web.xml` or `BannerAccessMgmt.ws/WEB-INF/web.xml`
-2. Find the `<session-config>` element
-3. Edit the `<session-timeout>` element
+1. Open `BannerAdmin.ws/WEB-INF/web.xml` or `BannerAccessMgmt.ws/WEB-INF/web.xml`.
+2. Find the `<session-config>` element.
+3. Edit the `<session-timeout>` element.
 
     ```xml
     <session-config>
         <session-timeout>260</session-timeout>
     </session-config>
     ```
-4. Restart Tomcat for the changes to take effect
+4. Restart Tomcat for the changes to take effect.
 
 #### Configuring the Admin Pages and Access Management SAML Token Lifetime
 
@@ -698,7 +719,7 @@ To prevent mismatched SAML token ages amongst apps, you must configure the `maxA
             </bean>
         ```
 3. Make sure to set the value of the `maxAuthenticationAge` property to the time period set in your [Entra sign-in frequency policy](#creating-a-sign-in-frequency-conditional-access-policy). The value is in seconds (43200 seconds = 12 hours). 
-4. Restart Tomcat for the changes to take effect
+4. Restart Tomcat for the changes to take effect.
 
 #### Testing the Admin Pages' SSO Without Application Navigator
 
@@ -714,6 +735,8 @@ If you would like to test Admin Pages on its own or if you don't have Applicatio
 4. If successful, you should see the GUACONF form load.
 
 ## Banner 8 Self-Service
+
+**NOTE:** As of January 1, 2026, Banner 8 Self-Service has reached end-of-life status by Ellucian. I will leave this section of the guide for anyone that needs it, but I will no longer be updating it as we no longer use it in our environment.
 
 Banner 8 Self-Service uses the SSOManager app to facilitate single sign-on. SSOManager is part of the Banner Enterprise Identity Services (BEIS) package. Documentation for SSOManager can be found within the BEIS documentation.
 
@@ -741,6 +764,10 @@ Use the following settings for creating an app in Entra:
 * Reply URL (ACS URL) = `https://server.univ.edu:8445/ssomanager/saml/SSO`
     * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
     * Modify the URL and port to point to your server.
+* Sign on URL =
+    * Leave empty.
+* Relay State = 
+    * Leave empty.
 * Logout URL = `https://server.univ.edu:8445/ssomanager/saml/SingleLogout`
     * This URL is case-sensitive.
     * Modify the URL and port to point to your server.
@@ -759,7 +786,7 @@ Store this file locally to be used in the [Configuring SSOManager](#configuring-
 
 ### Identity Provider XML Metadata File for Banner 8 Self-Service
 
-The "Federation Metadata XML" metadata file downloaded from Entra did not work with SSOManager when I tested it. Instead, I used the sample identity provider XML metadata file found in the `examples` directory of this project. Please see the [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service IDP XML Metadata File](#banner-admin-pages-banner-access-management-appxtenderappenhancer-and-banner-8-self-service-idp-xml-metadata-file) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions.
+The "Federation Metadata XML" metadata file downloaded from Entra did not work with SSOManager when I tested it. Instead, I used the sample identity provider XML metadata file found in the `examples` directory of this project. Please see the [Banner Admin Pages, Banner Access Management, AppXtender/AppEnhancer, and Banner 8 Self-Service IDP XML Metadata File](#banner-admin-pages-banner-access-management-and-banner-8-self-service-idp-xml-metadata-file) section of [Creating an Identity Provider XML Metadata File](#creating-an-identity-provider-xml-metadata-file) for more instructions.
 
 Store this file to be used in the [Configuring SSOManager](#configuring-ssomanager) section.
 
@@ -776,7 +803,7 @@ Store this file to be used in the [Configuring SSOManager](#configuring-ssomanag
     ```
     cp samlkeystore.jks ssomanager/WEB-INF/classes/samlKeystore.jks
     ```
-    * Overwrite the old file when prompted
+    * Overwrite the old file when prompted.
     * **NOTE:** If you don't want to rename the file, just edit the filename in the securityContext.xml file.
 4. Edit the `securityContext.xml` file.
     * Find the bean with `id=”keyManager”`
@@ -824,20 +851,20 @@ Store this file to be used in the [Configuring SSOManager](#configuring-ssomanag
         ```
         jar uvf ssomanager.war WEB-INF
         ```
-10. Deploy the new version of `ssomanager.war`
+10. Deploy the new version of `ssomanager.war`.
 11. Once SSOManager is deployed, access the SSOManager configuration website.
-    * Go to the `SSB Configuration` tab
-    * Set the mode to `SAML 2.0`
-    * Set UDC ID Indicator to `Cookie`
-    * Set UDC ID Key to `UDC_IDENTIFIER`
-12. Click Save
+    * Go to the `SSB Configuration` tab.
+    * Set the mode to `SAML 2.0`.
+    * Set UDC ID Indicator to `Cookie`.
+    * Set UDC ID Key to `UDC_IDENTIFIER`.
+12. Click `Save`.
 
 ### Configuring the Tomcat Session Timeout for Banner 8 Self-Service
 
 Self-Service Banner 8's session timeout is configured using Tomcat's own `web.xml` file unlike Application Navigator and Banner 9 SSB apps, which use a value set in GUACONF. 
 
-1. Edit `conf/web.xml` within the Tomcat install directory
-2. Find the `<session-config>` element
+1. Edit `conf/web.xml` within the Tomcat install directory.
+2. Find the `<session-config>` element.
 3. Edit the `<session-timeout>` value to an integer in minutes
 
     ```xml
@@ -850,9 +877,9 @@ Self-Service Banner 8's session timeout is configured using Tomcat's own `web.xm
 
 ### Update GUACONF
 
-1. Login to Banner Admin Pages
-2. Open `GUACONF`
-3. Select `GLOBAL` for the Application ID
+1. Login to Banner Admin Pages.
+2. Open `GUACONF`.
+3. Select `GLOBAL` for the Application ID.
 4. On the Configurations tab, set `banner8.SS.url` to:
     * `https://server.univ.edu:8445/ssomanager/saml/login?relayState=/c/auth/SSB?pkg=`
     * Modify the URL and port to point to your server.
@@ -866,11 +893,11 @@ Self-Service Banner 8's session timeout is configured using Tomcat's own `web.xm
             * Ex. `https://server.univ.edu:8445/ssomanager/saml/logout`
             * This URL is case-sensitive.
             * Modify the URL and port to point to your server.
-6. Click Save 
+6. Click `Save`.
 
-## AppXtender/AppEnhancer (Banner Document Managment)
+## AppXtender (Banner Document Managment)
 
-OpenText AppXtender is an app that integrates with Banner Document Management. Recently, the app was renamed to AppEnhancer. I will refer to it as AppXtender since I used AppXtender 20.4 to write this guide. It looks like some of these settings may have changed in AppEnhancer, but I do not have an install to test it with. Please refer to your version's documentation if these instructions do not work.
+OpenText AppXtender is an application that integrates with Banner Document Management. As of version 23, the app was renamed to AppEnhancer. The following setup is referred to as "BDM SSO" by Ellucian and will work up to version 24.4 of AppEnhancer, but please be aware that ["BDM SSO" support is deprecated](https://elluciansupport.service-now.com/customer_center?sys_kb_id=ca1c26a7c337a65488a01d63e40131b0&id=kb_article_view) as of August 21, 2025. For instructions on using the new built-in SSO support for AppEnhancer, please refer to the [AppEnhancer (Banner Document Management) section](#appenhancer-banner-document-management).
 
 To get AppXtender working with Entra, you must first install the SSO files. Instructions to download and install the files can be found in the Ellucian documentation linked in the [Configuring AppXtender](#configuring-appxtender) section.
 
@@ -890,8 +917,12 @@ To get AppXtender working with Entra, you must first install the SSO files. Inst
 * Reply URL (ACS URL) = `https://server.univ.edu/AppXtender/BdmSamlSso`
     * Assume the URL is case-sensitive.
     * Modify the URL and port to point to your server.
+* Sign on URL =
+    * Leave empty.
+* Relay State = 
+    * Leave empty.
 * Logout URL = 
-    * Leave blank. The BDM documentation does not mention a logout URL.
+    * Leave empty.
 * Include the following attribute:
     * `UDC_IDENTIFIER`
 
@@ -909,7 +940,7 @@ Please refer to the [Creating a PKCS #12 version of the Java Keystore](#creating
 3. Copy the PFX keystore to the AppXtender install location.
 4. Locate the `bdm.sso.config` file within the AppXtender install location. Edit the following tags:
     * `SsoMode`
-        * Set to `SAML2`
+        * Set to `SAML2`.
         * Ex. `<SsoMode>SAML2</SsoMode>`
     * `IdpSsoUrl`
         * Set to the `Login URL` found in Box 4 of the Entra SAML configuration page. You can also use the URL in the example, but make sure to replace the tenant ID with your own.
@@ -918,7 +949,7 @@ Please refer to the [Creating a PKCS #12 version of the Java Keystore](#creating
         * Set to the entity ID of the Entra application. This can be found in Box 1 of the Entra SAML configuration page.
         * Ex. `<ServiceProviderId>banner-bdm-test-sp</ServiceProviderId>`
     * `EncryptedAssertions`
-        * Set to false
+        * Set to false.
         * Ex.`<EncryptedAssertions>false</EncryptedAssertions>`
     * `IdpPublicKey`
         * Download the `Certificate (Raw)` file from Box 3 in the Entra SAML configuration page. 
@@ -935,19 +966,240 @@ Please refer to the [Creating a PKCS #12 version of the Java Keystore](#creating
         * Enter the password of the PFX file.
         * Ex. `<SpPrivateKeyPassword>keystorepassword</SpPrivateKeyPassword>`
     * `ArtifactServiceUrl`
-        * Enter the URL for AppXtender
+        * Enter the URL for AppXtender.
         * Ex. `<ArtifactServiceUrl>https://server.univ.edu/AppXtender</ArtifactServiceUrl>`
     * `UDCIDAttributeName`
         * Set to the name of the attribute being sent over from Entra. This is commonly set to “UDC_IDENTIFIER”.
         * Ex. `<UDCIDAttributeName>UDC_IDENTIFIER</UDCIDAttributeName>`
 5. Save the `bdm.sso.config` file.
-6. Restart IIS
-7. Use the following URL format to access the site via SSO.
-    * Replace `Datasourcename` with the name of your data source in AppXtender. (ie. TEST, PROD, etc)
-    * Ex. `https://server.univ.edu/AppXtender/DataSources/*Datasourcename*/?sso=true&DSN=*Datasourcename*`
+6. Restart IIS.
+7. Use the following URL format to access the site via SSO:
+    * Replace `DataSourceName` with the name of your data source in AppXtender. (ie. TEST, PROD, etc)
+    * Ex. `https://server.univ.edu/AppXtender/DataSources/*DataSourceName*/?sso=true&DSN=*DataSourceName*`
 
 ### Configuring SSO Integration with Banner Admin Pages and AppXtender
-1. Go to `EXAINST` in Banner Admin Pages
+1. Go to `EXAINST` in Banner Admin Pages.
 2. Set the ApplicationXtender Web Access Root value:
-    * Modify the URL and port to point to your AppXtender instance 
+    * Modify the URL to point to your AppXtender instance 
     * Ex. `https://server.univ.edu/AppXtender/ISubmitQuery.aspx?sso=true`
+3. Set the SSO Mapping to `External User ID`.
+4. Click `Save`.
+
+## AppEnhancer (Banner Document Management)
+
+OpenText AppEnhancer is an application that integrates with Banner Document Management. The application was formerly named OpenText AppXtender and was renamed for version 23. One of the new features of AppEnhancer is built-in support for single sign-on. Please be aware that Ellucian refers to the old way of integrating SSO as "BDM SSO" and the new way as "AE SSO". AE SSO is now the preferred method of SSO integration as [BDM SSO support was deprecated](https://elluciansupport.service-now.com/customer_center?sys_kb_id=ca1c26a7c337a65488a01d63e40131b0&id=kb_article_view) on August 21, 2025.
+
+If you were previously using BDM SSO with AppEnhancer, please see the [Migration from BDM SSO to AE SSO](https://elluciansupport.service-now.com/customer_center?sys_kb_id=ca1c26a7c337a65488a01d63e40131b0&id=kb_article_view) guide by Ellucian. You will need to remove the SSO code previously added to the AppEnhancer code as well as a few files. Make sure you restart IIS after removing the files.
+
+AppEnhancer natively supports a few SSO protocols like SAML2, CAS, and ADFS. For this guide, we will be using SAML2. Both AppEnhancer Web Access and AppEnhancer Admin support SSO and will be covered in this guide. 
+
+### Task List for AppEnhancer
+
+- [ ] [Create an app in Entra](#creating-an-entra-application)
+    - [ ] [Configuring Entra for AppEnhancer Web Access](#configuring-entra-for-appenhancer-web-access)
+    - [ ] [Configuring Entra for AppEnhancer Admin](#configuring-entra-for-appenhancer-admin)
+- [ ] [Configure a Sign-in Frequency Conditional Access Policy](#creating-a-sign-in-frequency-conditional-access-policy)
+- [ ] [Create the AppEnhancer SSO Certificate](#creating-the-appenhancer-sso-certificate)
+- [ ] [Configure AppEnhancer Web Access](#configuring-appenhancer-web-access)
+- [ ] [Configure AppEnhancer Admin](#configuring-appenhancer-admin)
+- [ ] [Migrate Existing BDM SSO Users to AppEnhancer SSO](#migrate-existing-bdm-sso-users-to-appenhancer-sso)
+- [ ] [Configure SSO Integration with Banner Admin Pages and AppEnhancer](#configuring-sso-integration-with-banner-admin-pages-and-appxtender)
+
+### Creating the AppEnhancer SSO Certificate
+
+To perform a SSO login, AppEnhancer Web Access must use an SSL certificate for SAML request verification. The OpenText documentation recommends using the same certificate as the web host server, but another possibility is using a self-signed certificate that can be valid for much longer. The PowerShell script I have included in this project creates a self-signed certificate that is valid for 10 years. The public key will need to be exported and uploaded to Entra.
+
+Using the server's SSL certificate is also an option. However, do note that you will need to move the certificate from the WebHosting certificate store to the Personal certificate store. You will also need to update the certificate fingerprint within the web.config files and upload the new certificate to Entra every time you renew the certificate. This is usually a yearly task. Using a self-signed certificate has the advantage of not having to worry about the certificate for a long time.
+
+#### Create a Self-Signed Certificate for AppEnhancer SSO Request Signing
+
+1. Open PowerShell.
+2. Run the `iis_self_signed_cert.ps1` script found in the [scripts](scripts/) directory of this repository.
+3. After running the command, the certificate Thumbprint will be printed to the screen. Save this thumbprint for the [Configuring AppEnhancer Web Access](#configuring-appenhancer-web-access) and [Configuring AppEnhancer Admin](#configuring-appenhancer-admin) sections.
+
+#### Export the Certificate Public Key
+
+1. Open the Certificates apps in Windows.
+2. Under Personal > Certificates, find the certificate with `AppEnhancer SSO Certificate` as the Friendly Name.
+3. Right click, go to `All Tasks` > `Export…`
+4. Click `Next`.
+5. Select `No, do not export the private key`.
+6. Click `Next`.
+7. Select `Base-64 encoded X.509 (.CER)`.
+8. Click `Next`.
+9. Choose a location to store the exported certificate.
+10. Click `Next`.
+
+#### Upload the SSO Certificate to Entra
+
+If you are not an Entra ID admin, send the public certificate to your admin to upload to the Entra app's SAML Verificate Certificates section.
+
+**NOTE:** You may only need to upload the certificate to the AppEnhancer Web Access Entra app. By a happy accident, I discovered that AppEnhancer Admin still worked without the public key uploaded to Entra and only the certificate thumbprint added to web.config.
+
+1. Open the Entra app.
+2. Click on Single Sign-on.
+3. Go to the `SAML certificates` section.
+4. Click on Edit next to Verification Certificates.
+5. Enable `Require verification certificates` and `Allow requests signed with RSA-SHA1`.
+6. Click `Upload Certificate` and locate the exported public certificate to upload.
+
+### Configuring Entra for AppEnhancer Web Access
+
+* Entity ID = `banner-appenhancer-test-sp`
+    * This can be whatever you want. Just make it unique to your Entra tenant.
+* Reply URL (ACS URL) = `https://server.univ.edu/AppEnhancer/account/Saml2SingleSignOnHandler`
+    * Assume the URL is case-sensitive.
+    * Modify the URL and port to point to your server.
+* Logout URL = 
+    * Leave empty. The BDM documentation does not mention a logout URL.
+* Sign on URL =
+    * Leave empty.
+* Relay State = 
+    * Leave empty.
+* Include the following attribute:
+    * `UDC_IDENTIFIER`
+    * `username`
+
+#### Upload the SAML Verification Certificate
+
+**NOTE:** You may only need to upload the certificate to the AppEnhancer Web Access Entra app. By accident, I discovered that AppEnhancer Admin 24.4 still worked without the public key uploaded to Entra and only the certificate thumbprint added to web.config. It's possible that this is a bug and you may need to upload the public key to Entra in future versions.
+
+1. Open the Entra app
+2. Click on `Single Sign-on`
+3. Go to the `SAML certificates` section
+4. Click on Edit next to Verification Certificates
+5. Enable `Require verification certificates` and `Allow requests signed with RSA-SHA1`
+6. Click `Upload Certificate` and locate the exported public key.
+7. Click `OK`.
+
+### Configuring Entra for AppEnhancer Admin
+
+* Entity ID = `banner-appenhancer-admin-test-sp`
+    * This can be whatever you want. Just make it unique to your Entra tenant.
+* Reply URL (ACS URL) = `https://server.univ.edu/AppEnhancerAdmin/account/Saml2SingleSignOnHandler`
+    * Assume the URL is case-sensitive.
+    * Modify the URL and port to point to your server.
+* Sign on URL =
+    * Leave empty.
+* Relay State = 
+    * Leave empty.
+* Logout URL = 
+    * Leave empty.
+* Include the following attribute:
+    * `UDC_IDENTIFIER`
+    * **NOTE:** The username attribute is not needed for AppEnhancer Admin.
+
+### Configuring AppEnhancer Web Access
+
+AppEnhancer Web Access' SAML configuration is done in the `web.config` file. It can be found in the application directory. For example, you may find this file at `C:\inetpub\wwwroot\AppEnhancer\web.config`. Open this file in a text editor. IIS must be restarted for any changed to take effect.
+
+1. Find the `<externalAuth>` element.
+    1. Uncomment the entire `<externalAuth>` element.
+    2. Comment out the “cas” and “adfs” providers.
+    3. Make sure the “saml2” provider is uncommented.
+2. Find the `<saml2ClientConfig>` element.
+    1. Uncomment the entire element.
+    2. Edit the following settings:
+        *  servername
+            * `https://server.univ.edu`
+        * attributeMap_Usrname
+            * `username`
+        * attributeMap_Securid
+            * `UDC_IDENTIFIER`
+        * issuer
+            * ex. `banner-appenhancer-test-sp`
+            * *NOTE:* Change this to the Identifier (Entity ID) setup in Entra.
+        * saml2server
+            * `https://login.microsoftonline.com/*tenant-id*/saml2`
+        * assertionConsumerServiceIndex
+            * `-1`
+        * saml2ServerSloEndpoint
+            * `https://login.microsoftonline.com/*tenant-id*/saml2`
+        * nameIDPolicy
+            * `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`
+        * certificateValidator
+            * `None`
+        * clientCertificateThumbprint
+            * This is the self-signed certificate thumbprint that was generated from the PowerShell script. If you ran the PowerShell script during this install, you may still have it on hand. Otherwise use the next step to get the thumbprint.
+            * If needed, get the `AppEnhancer SSO Certificate` thumbprint by opening the Certificates app in Windows. 
+                * Navigate to `Personal` > `Certificate`.
+                * Double click on the cert with the Friendly Name of `AppEnhancer SSO Certificate` .
+                * Go to the `Details` tab.
+                * Scroll down to the `Thumbprint` field.
+                * Copy the thumbprint value.
+            * **NOTE:** This is a self-signed cert that is valid for 10 years. So you won’t need to update it for a while. If you're using the server's SSL certificate, it will need to be updated when it expires, which is usually every year.
+        * isCasServer
+            * `false`
+        * ignoreGroups
+            * `true`
+3. Save the file.
+4. Restart IIS.
+5. Test the SSO login by going to the app URL and clicking the SAML2 link or using the [SSO direct link](#direct-linking-to-appenhancer).
+
+### Configuring AppEnhancer Admin
+
+AppEnhancer Admin's SAML configuration is done in the `web.config` file. It can be found in the application directory. For example, you may find this file at `C:\inetpub\wwwroot\AppEnhancerAdmin\web.config`. Open this file in a text editor. IIS must be restarted for any changed to take effect.
+
+1. Find the `<externalAuth>` element.
+    1. Uncomment the entire `<externalAuth>` element.
+    2. Comment out the “cas” and “adfs” providers.
+    3. Make sure the “saml2” provider is uncommented.
+2. Find the `<saml2ClientConfig>` element.
+    1. Uncomment the entire element.
+    2. Edit the following settings:
+        *  servername
+            * `https://server.univ.edu`
+        * attributeMap_Securid
+            * `UDC_IDENTIFIER`
+        * issuer
+            * ex. `banner-appenhancer-admin-test-sp`
+            * **NOTE:** Change this to the Identifier (Entity ID) setup in Entra.
+        * saml2server
+            * `https://login.microsoftonline.com/*tenant-id*/saml2`
+        * assertionConsumerServiceIndex
+            * `-1`
+        * saml2ServerSloEndpoint
+            * `https://login.microsoftonline.com/*tenant-id*/saml2`
+        * nameIDPolicy
+            * `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`
+        * certificateValidator
+            * `None`
+        * clientCertificateThumbprint
+            * This is the self-signed certificate thumbprint that was generated from the PowerShell script. If you ran the PowerShell script during this install, you may still have it on hand. Otherwise use the next step to get the thumbprint.
+            * If needed, get the “AppEnhancer SSO Certificate” thumbprint by opening the Certificates app in Windows. 
+                * Navigate to Personal > Certificate 
+                * Double click on the cert with the Friendly Name of “AppEnhancer SSO Certificate”.
+                * Go to the Details tab
+                * Scroll down to the Thumbprint field
+                * Copy the thumbprint value
+            * **NOTE:** This is a self-signed cert that is valid for 10 years. So you won’t need to update it for a while. If you're using the server's SSL certificate, it will need to be updated when it expires, which is usually every year.
+        * isCasServer
+            * `false`
+3. Save the file.
+4. Restart IIS.
+5. Test the SSO login by going to the app URL and clicking the SAML2 link.
+
+### Migrate Existing BDM SSO Users to AppEnhancer SSO
+
+If you are migrating from BDM SSO to AppEnhancer SSO, you must update the AE_LOGIN table to switch each user's PROVIDERID field to the new provider ID and insert the user's UDC Identifier into the SECURID field. [Ellucian has provided ample documentation](https://elluciansupport.service-now.com/customer_center?id=kb_article&sysparm_article=KB000511350) on this process so I will not cover it here. The aforementioned page includes a SQL script that can be run to simplify this process.
+
+### Configure SSO Integration with Banner Admin Pages and AppEnhancer
+
+1. Go to `EXAINST` in Banner Admin Pages.
+2. Set the ApplicationXtender Web Access Root value:
+    * Modify the URL to point to your AppEnhancer instance. 
+    * **NOTE:** The setting in `EXAINST` still refers to the application as AppXtender.
+    * Ex. `https://server.univ.edu/AppEnhancer/ISubmitQuery.aspx?ExternalLogin&ssoProvider=SAML2`
+3. Set the SSO Mapping to `External User ID`.
+4. Set the Single Sign-On Key to a password of your choosing. This will need to be used for the `WxCryptoKey` key in both AppEnhancer Web Access and AppEnhancer Admin's web.config files.
+4. Click `Save`.
+
+### Direct Linking to AppEnhancer
+
+You may link directly to the AppEnhancer SSO page (service provider initiated login) by using the following URL format. This will allow users to click the link and be automatically signed in to AppEnhancer if they are already authenticated to your SSO tenant.
+
+https://server.univ.edu/AppEnhancer/?ExternalLogin&ssoProvider=SAML2
+
+**NOTE:** This URL is similar to the one used for EXAINST, but does not include "ISubmitQuery.aspx". Using the EXAINST URL will not work for direct linking.
+
+**NOTE:** There does not seem to be a direct link URL for AppEnhancer Admin.
