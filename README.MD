@@ -106,8 +106,12 @@ Formerly called Microsoft Azure Active Directory (Azure AD), Microsoft Entra is 
 		* Click Edit at the top right of the first box labeled `Basic SAML Configuration`. Enter a unique name in the “Identifier (Entity ID)” field. This name will be used in your service provider XML metadata file later on and should be unique to each Banner application and unique to your Entra tenant. 
 			* Ex. `banner-stuss-test-sp`
 		* Enter the ACS (Assertion Consumer Service) URL of your Banner app in the `Reply URL` field. 
-			* Below is just an example. Each Banner app section will include more specific examples. Please check the respective section instead of copying this one.
-			* Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
+			* Below is just an example. Each Banner app section will include more specific examples. Please check the respective section instead of copying this one. Replace `entity-id` with the Entity ID entered in the “Identifier” field.
+			* **NOTE:** Do not add `/alias/*entity-id*` to the ACS URL for Banner Admin Pages and Banner Access Management.
+            * Application Navigator and Self-Service 9 applications:
+                * Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SSO/alias/*entity-id*`
+            * Banner Admin Pages and Banner Access Management:
+                * Ex. `https://server.univ.edu:8443/BannerAdmin.ws/saml/SSO`
 			* The URL is case-sensitive.
 			* Modify the URL and port to point to your server.
 		* Enter a URL in the `Logout URL` field. This URL will be used to send data to the app in the event of a Single Logout (SLO) being triggered. If you don't use SLO, you may ignore this field. The URL will follow the example below. Replace `entity-id` with the Entity ID entered in the “Identifier” field. Below is just an example. Each Banner app section will include more specific examples.
@@ -226,7 +230,11 @@ This is a two-step process. You will first need to export the public certificate
         * Modify the URL and port to point to your server.
     * `<md:AssertionConsumerService>`
         * In both `<md:AssertionConsumerService>` elements, edit the `Location` attributes to the same URL. Use the following example and modify it for the application you are configuring.
-        * Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
+        * **NOTE:** Do not add `/alias/*entity-id*` to the ACS URL for Banner Admin Pages and Banner Access Management.
+        * Application Navigator and Self-Service 9 applications:
+            * Ex. `https://server.univ.edu:8443/StudentSelfService/saml/SSO/alias/*entity-id*`
+        * Banner Admin Pages and Banner Access Management:
+            * Ex. `https://server.univ.edu:8443/BannerAdmin.ws/saml/SSO`
         * The URL is case-sensitive.
         * Modify the URL and port to point to your server.
 4. Save the file.
@@ -270,7 +278,7 @@ In my testing, these apps support using the "Federation Metadata XML" file that 
 
 ## Banner 9 Self-Service Apps and Application Navigator
 
-An sample Student Self-Service groovy file is available in the `examples` directory, but do not use the sample file for all applications. It is only for demonstration purposes. The configuration files can change between releases and each app has different configurations. However, the SAML configuration should be fairly similar in all of the apps. You must modify the groovy file delivered with the version of the app being deployed.
+A sample Student Self-Service groovy file is available in the `examples` directory, but do not use the sample file with an application. It is only for demonstration purposes. The configuration files can change between releases and each app has different configurations. However, the SAML configuration should be fairly similar in all of the apps. You must modify the groovy file delivered with the version of the app being deployed.
 
 The following Banner 9 Self-Service apps have been tested with these instructions: Communication Management, Employee SSB, Extensibility, Faculty SSB, Finance SSB, General SSB, Student Registration SSB, and Student SSB. Application Navigator is not a SSB app, but it is built on the same framework as the SSB 9 apps so it uses a similar configuration.
 
@@ -295,9 +303,11 @@ Use the following settings for creating an app in Entra:
 * Entity ID = `banner-stuss-test-sp`
     * This can be whatever you want. Just make it unique to your Entra tenant. 
     * I will be using Banner 9 Student Self-Service as an example.
-* Reply URL (ACS URL) = `https://server.univ.edu:8443/StudentSelfService/saml/SSO`
-    * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
+    * As of the [June 2026 releases](https://elluciansupport.service-now.com/customer_center?sys_kb_id=28f16ff197cf83108a76b6e8c253af21&id=kb_article_view), the entity ID needs to be [less than 30 characters](https://elluciansupport.service-now.com/customer_center?id=community_question&sys_id=7c9cc982976d4b90ebc2bdcfe153af8c). If you have to update the entity ID for this adjustment, make sure you update the entity ID in Entra, your Service Provider XML file, and in your application's .groovy file. 
+* Reply URL (ACS URL) = `https://server.univ.edu:8443/StudentSelfService/saml/SSO/alias/banner-stuss-test-sp`
+    * The URL is case-sensitive. Make sure “SSO” is capitalized. 
     * Modify the URL and port to point to your server.
+    * As of the [June 2026 releases](https://elluciansupport.service-now.com/customer_center?sys_kb_id=28f16ff197cf83108a76b6e8c253af21&id=kb_article_view), you need to include "/alias/banner-stuss-test-sp" at the end of the ACS URL. Make sure to replace "banner-stuss-test-sp" with the app's entity ID.
 * Sign on URL =
     * Leave empty.
 * Relay State = 
@@ -546,6 +556,7 @@ Use the following settings for creating an app in Entra:
 * Reply URL (ACS URL) = `https://server.univ.edu:8443/BannerAdmin.ws/saml/SSO`
     * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
     * Modify the URL and port to point to your server.
+    * **NOTE:** Do not add `/alias/*entity-id*` to the ACS URL for Banner Admin Pages.
 * Sign on URL =
     * Leave empty.
 * Relay State = 
@@ -565,6 +576,7 @@ Use the following settings for creating an app in Entra:
 * Reply URL (ACS URL) = `https://server.univ.edu:8443/BannerAccessMgmt.ws/saml/SSO`
     * The URL is case-sensitive. Make sure “SSO” is capitalized at the end.
     * Modify the URL and port to point to your server.
+    * **NOTE:** Do not add `/alias/*entity-id*` to the ACS URL for Banner Access Management.
 * Logout URL = `https://server.univ.edu:8443/BannerAccessMgmt.ws/saml/SingleLogout`
     * This URL is case-sensitive.
     * Modify the URL and port to point to your server.

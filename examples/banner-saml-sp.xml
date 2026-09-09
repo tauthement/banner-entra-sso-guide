@@ -42,8 +42,8 @@ DO NOT include the BEGIN CERTIFICATE and END CERTIFICATE lines.
 <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameidformat:unspecified</md:NameIDFormat>
 <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameidformat:X509SubjectName</md:NameIDFormat>
 <!-- Modify the URL to point the Banner app you are setting up. -->
-<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://server.univ.edu:8443/SelfServiceApp/saml/SSO" index="0" isDefault="true"/>
+<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://server.univ.edu:8443/SelfServiceApp/saml/SSO/alias/entra-app-entity-id" index="0" isDefault="true"/>
 <!-- Modify the URL to point the Banner app you are setting up. -->
-<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:profiles:holderof-key:SSO:browser" Location="https://server.univ.edu:8443/SelfServiceApp/saml/SSO" hoksso:ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" index="2" xmlns:hoksso="urn:oasis:names:tc:SAML:2.0:profiles:holder-ofkey:SSO:browser"/>
+<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:profiles:holderof-key:SSO:browser" Location="https://server.univ.edu:8443/SelfServiceApp/saml/SSO/alias/entra-app-entity-id" hoksso:ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" index="2" xmlns:hoksso="urn:oasis:names:tc:SAML:2.0:profiles:holder-ofkey:SSO:browser"/>
 </md:SPSSODescriptor>
 </md:EntityDescriptor>

@@ -171,7 +171,7 @@ grails.plugin.springsecurity.saml.metadata.providers = [eis: '/u01/app/tomcat/sa
 grails.plugin.springsecurity.saml.metadata.defaultIdp = 'https://sts.windows.net/<entra-tenant-id>/' //Same value as configured in the IDP xml
 grails.plugin.springsecurity.saml.metadata.sp.defaults = [
         local: true,
-        alias: 'ssb-app-entityid',                                   // banner-<short-appName>-sp is the value set in EIS Service provider setup
+        alias: 'entra-app-entity-id',                                   // banner-<short-appName>-sp is the value set in EIS Service provider setup
         securityProfile: 'metaiop',
         signingKey: 'certificate-alias',                              // banner-<short-appName>-sp is the value set in EIS Service provider setup
         encryptionKey: 'certificate-alias',                           // banner-<short-appName>-sp is the value set in EIS Service provider setup
